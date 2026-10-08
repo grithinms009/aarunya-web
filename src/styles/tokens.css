@@ -1,0 +1,40 @@
+/* Design tokens — from design_handoff_aarunya_storefront/README.md "Design tokens".
+   Values are the source of truth for every colour, size and spacing decision. */
+:root {
+  /* Colours */
+  --bg: #fff9f6;
+  --bg-hero: #fcf0ee;
+  --blush: #fbefef;
+  --blush-2: #fbe8e4;
+  --white: #ffffff;
+  --ink: #302722;
+  --ink-muted: #756964;
+  --ink-body: #5e534e;
+  --ink-soft: #3e3430;
+  --wine: #8d3545;
+  --wine-hover: #76293a;
+  --gold: #c79a45;
+  --gold-deep: #9d762f;
+  --gold-text: #8a6527;
+  --gold-light: #e7d3ae;
+  --line: #f0e2de;
+  --line-chip: #eadad4;
+  --line-input: #e3cfc8;
+  --success: #3e7b5c;
+  --whatsapp: #25d366;
+  --selection: #f4d8dc;
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Jost', sans-serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-mono: ui-monospace, Menlo, monospace;
+
+  /* Layout */
+  --max-w: 1280px;
+  --side-pad: clamp(16px, 4vw, 40px);
+
+  /* Motion */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

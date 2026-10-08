@@ -1,0 +1,163 @@
+.grid {
+  display: grid;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-width: 0;
+}
+.fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.legend {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  padding: 0;
+  letter-spacing: 0.01em;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.label {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+.input,
+.select {
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--white);
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+  width: 100%;
+}
+.input:focus,
+.select:focus {
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(199, 154, 69, 0.18);
+}
+.err {
+  font-size: 12px;
+  color: var(--wine);
+}
+.payCard {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--gold);
+  background: var(--white);
+  cursor: pointer;
+}
+.submit {
+  height: 56px;
+  border-radius: 999px;
+  border: none;
+  background: var(--wine);
+  color: var(--bg);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.25s;
+  font-family: inherit;
+}
+.submit:hover:not(:disabled) {
+  background: var(--wine-hover);
+}
+.summary {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: clamp(18px, 3vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sumLine {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+.sumThumb {
+  position: relative;
+  aspect-ratio: 4/5;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.qtyBadge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.divider {
+  height: 1px;
+  background: var(--line);
+}
+.doneCard {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  padding: clamp(36px, 6vw, 64px) clamp(20px, 4vw, 48px);
+  background: var(--blush);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.payCode {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  background: var(--bg);
+  border: 1px dashed var(--line-input);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: left;
+  line-height: 1.6;
+}
+.emptyCard {
+  text-align: center;
+  padding: 64px 20px;
+  background: var(--blush);
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .submit {
+    transition: none;
+  }
+}

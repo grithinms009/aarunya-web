@@ -1,0 +1,27 @@
+.bar {
+  background: var(--wine);
+  color: var(--bg);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.track {
+  display: flex;
+  width: max-content;
+  padding: 9px 0;
+  will-change: transform;
+}
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 32px;
+  padding-right: 32px;
+}
+.diamond {
+  width: 5px;
+  height: 5px;
+  border: 1px solid #e7c98f;
+  transform: rotate(45deg);
+}

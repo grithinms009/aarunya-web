@@ -1,0 +1,151 @@
+/* ---- >=760px: the artwork with its heading baked in, plus a live CTA on top ---- */
+.imageWrap {
+  position: relative;
+  /* cqw units below resolve against this banner's width, so the CTA scales with the image. */
+  container-type: inline-size;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #f8e9db;
+  box-shadow: 0 12px 36px rgba(141, 53, 69, 0.07);
+}
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.liveCta {
+  position: absolute;
+  left: 24.3%;
+  top: 71.8%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqw;
+  width: 21.1cqw;
+  height: 4.58cqw;
+  border-radius: 999px;
+  background: var(--wine);
+  color: var(--bg);
+  font-size: max(12px, 1.15cqw);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(141, 53, 69, 0.22);
+  transition: background 0.25s, box-shadow 0.25s, gap 0.4s var(--ease), transform 0.25s;
+}
+.liveCta:hover {
+  background: #74283a;
+  gap: 1.5cqw;
+  box-shadow: 0 12px 26px rgba(141, 53, 69, 0.32);
+  transform: translateX(-50%) translateY(-2px);
+  color: var(--bg);
+}
+.liveCta:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.arrow {
+  font-size: 1.3em;
+}
+
+/* ---- <760px: the HTML version ---- */
+.htmlWrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fbf1e6 0%, #f4e3cf 100%);
+  border: 1px solid #ebd9c2;
+}
+.htmlText {
+  padding: clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(12px, 1.6vw, 18px);
+}
+.eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #7a6656;
+}
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(40px, 5.6vw, 68px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #3d2e22;
+}
+.headingAccent {
+  color: #b38a45;
+}
+.sub {
+  font-size: clamp(15px, 1.5vw, 18px);
+  letter-spacing: 0.14em;
+  color: #4e3f33;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 280px);
+}
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #c9a468;
+}
+.script {
+  font-family: var(--font-script);
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.1;
+  color: #3d2e22;
+}
+.darkCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 30px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: #4a3a2b;
+  color: var(--bg);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(214, 178, 112, 0.55);
+  transition: background 0.25s;
+}
+.darkCta:hover {
+  background: var(--wine);
+  color: var(--bg);
+}
+.photo {
+  min-height: 280px;
+  background: #f1e1cc;
+}
+.photoImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .liveCta,
+  .darkCta {
+    transition: none;
+  }
+  .liveCta:hover {
+    transform: translateX(-50%);
+    gap: 1cqw;
+  }
+}

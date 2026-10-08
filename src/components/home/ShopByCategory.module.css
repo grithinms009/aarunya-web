@@ -1,0 +1,57 @@
+.tile {
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 4px 0;
+}
+.tile:hover {
+  color: var(--wine);
+}
+/* 1:1 circle with a 5px padding ring; the border turns gold on hover. */
+.ring {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  padding: 5px;
+  border: 1px solid var(--gold-light);
+  background: var(--bg);
+  transition: border-color 0.3s;
+}
+.tile:hover .ring {
+  border-color: var(--gold);
+}
+.clip {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.image {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s var(--ease-soft);
+}
+.tile:hover .image {
+  transform: scale(1.06);
+}
+.label {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.3vw, 16px);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .image {
+    transition: none;
+  }
+  .tile:hover .image {
+    transform: none;
+  }
+}

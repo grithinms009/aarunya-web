@@ -1,0 +1,112 @@
+.banner {
+  position: relative;
+  display: block;
+  /* The live CTA is sized in cqw, so it scales with the banner rather than the viewport. */
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f7e6e0;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(141, 53, 69, 0.08);
+}
+.bannerImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 1.4s var(--ease);
+}
+.banner:hover .bannerImg {
+  transform: scale(1.03);
+}
+/* Shared geometry for both CTA treatments. */
+.cta {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: max(8px, 1.4cqw);
+  height: max(36px, 6.15cqw);
+  padding: 0 max(18px, 3.4cqw);
+  border-radius: 999px;
+  font-size: max(11px, 1.75cqw);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.3s, gap 0.4s var(--ease);
+}
+.ctaSolid {
+  background: #c48f3e;
+  color: var(--bg);
+  box-shadow: 0 6px 16px rgba(150, 100, 35, 0.25);
+}
+.banner:hover .ctaSolid {
+  background: #ae7c31;
+  gap: max(12px, 2cqw);
+}
+.ctaOutline {
+  border: 1.5px solid #c9a06a;
+  background: rgba(255, 250, 246, 0.78);
+  color: var(--gold-text);
+}
+.banner:hover .ctaOutline {
+  background: var(--bg);
+  gap: max(12px, 2cqw);
+}
+.ctaArrow {
+  width: max(14px, 2.1cqw);
+  height: auto;
+}
+
+/* ---- promise strip ---- */
+.promise {
+  list-style: none;
+  margin: clamp(14px, 1.8vw, 24px) 0 0;
+  padding: clamp(6px, 1vw, 12px) clamp(6px, 1.4vw, 20px);
+  display: grid;
+  background: #fffcfa;
+  border-radius: 18px;
+  box-shadow: 0 10px 34px rgba(141, 53, 69, 0.07);
+}
+.promiseItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 22px);
+  padding: clamp(14px, 1.8vw, 22px) clamp(10px, 1.4vw, 20px);
+}
+.promiseIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(46px, 4.6vw, 64px);
+  height: clamp(46px, 4.6vw, 64px);
+  border-radius: 50%;
+  background: var(--blush-2);
+}
+.promiseText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.promiseTitle {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.5vw, 20px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.promiseSub {
+  font-size: clamp(12px, 1vw, 13.5px);
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bannerImg,
+  .cta {
+    transition: none;
+  }
+  .banner:hover .bannerImg {
+    transform: none;
+  }
+}

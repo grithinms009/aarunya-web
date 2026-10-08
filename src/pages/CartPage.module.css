@@ -1,0 +1,112 @@
+.emptyCard {
+  text-align: center;
+  padding: 64px 20px;
+  background: var(--blush);
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.shipCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--blush);
+  border-radius: 14px;
+  margin-bottom: 6px;
+}
+.track {
+  height: 4px;
+  background: var(--selection);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.4s;
+}
+.line {
+  display: grid;
+  grid-template-columns: clamp(76px, 12vw, 104px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.thumb {
+  display: block;
+  aspect-ratio: 4/5;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line-input);
+  border-radius: 999px;
+  background: var(--white);
+}
+.stepBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  font-size: 17px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.removeBtn {
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  min-height: 40px;
+  font-family: inherit;
+}
+.summary {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: clamp(20px, 3vw, 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.divider {
+  height: 1px;
+  background: var(--line);
+}
+.checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  border-radius: 999px;
+  background: var(--wine);
+  color: var(--bg);
+  text-decoration: none;
+  font-size: 14.5px;
+  letter-spacing: 0.05em;
+  margin-top: 6px;
+  transition: background 0.25s;
+}
+.checkout:hover {
+  background: var(--wine-hover);
+  color: var(--bg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .checkout {
+    transition: none;
+  }
+}
