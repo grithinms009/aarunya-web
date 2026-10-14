@@ -3,12 +3,14 @@
 ## Overview
 A complete storefront for **Aarunya Jewels by Veena**, a small anti‑tarnish jewellery brand from Kerala selling Pan‑India. Shoppers browse by category, filter and sort, view product details with colour variants, save to a wishlist, add to a bag, check delivery by PIN code, and check out with online payment (Razorpay/Cashfree via backend). WhatsApp is the main support and personalisation channel.
 
+> **Updated 14 Oct 2026.** See `CHANGELOG.md` for what changed since the first handoff (admin‑managed banners and content, and order side effects).
+
 ## About the design files
 Everything in `design/` is a **design reference built in HTML**: a working prototype that shows the intended look and behaviour. It is **not production code to copy**. Recreate it in **React** (recommended stack below) using proper components, routing and state. Match visuals and behaviour exactly.
 
 To view the prototype: serve the `design/` folder with any static server (`npx serve design`) and open `Aarunya Store.dc.html`. Routing uses the URL hash (`#/shop`, `#/product/mango-mala-necklace`, …).
 
-- `design/Aarunya Store.dc.html`: the whole site. The markup is at the top with inline styles, which are the source of truth for every size, colour and spacing value. The logic class (`class Component`) is at the bottom, around line 1248 onwards.
+- `design/Aarunya Store.dc.html`: the whole site. The markup is at the top with inline styles, which are the source of truth for every size, colour and spacing value. The logic class (`class Component`) is at the bottom, around line 1251 onwards.
 - `design/ProductCard.dc.html`: the reusable product card.
 - `design/aarunya-api.js`: config, mock data and the API service layer. **Port this as the data layer.**
 - `design/support.js`: prototype runtime only. Ignore it in production.
@@ -153,14 +155,14 @@ Page titles follow `"{Page} | Aarunya Jewels by Veena"`. The home page title is 
   - "© 2026 Aarunya Jewels by Veena. All rights reserved."
 
 ### Home (in order)
-1. **Hero**: `assets/aarunya-hero-pastel.jpg`, an illustration of a girl in a magenta pavada.
+1. **Hero**: `assets/aarunya-hero-pastel.jpg`, an illustration of a girl in a magenta pavada. The image (desktop/mobile) and alt text can be replaced from admin through `BANNERS`; this file is the fallback.
    - Shown at natural size, max‑height `max(460px, 100vh − 150px)`, with 5% side fades and a 12% bottom fade into `#FCF0EE`.
    - **≥900px**: buttons are overlaid at left 31.6%, bottom 3.2% — **Shop Now** (wine pill) and **Explore Collections** (gold outline, cream 75% fill). There is a visually hidden H1.
    - **<900px**: below the image sits an ornament, H1 "Little treasures, chosen with love.", an intro paragraph and both buttons at full width.
 2. **Trust strip**: 4 items (Anti‑Tarnish Jewellery, Pan India Delivery, Free Shipping Above ₹499, Secure Payments). Each is a 40px gold‑outlined circle icon + 13px label. 4 columns on desktop, 2 below.
 3. **Shop by Category**: circular images (1:1, 5px padding ring, 1px gold‑light border that turns gold on hover, image zooms to 1.06). Label is Jost 14–16px/500. 8 columns at ≥1180, 4 at ≥600, 3 below.
 4. **Best Sellers**: `featured` products. 4 shown, 6 at 3 columns; the count is trimmed to fill whole rows. "View All →" outline pill goes to `/shop`.
-5. **Personalised Gift banner**:
+5. **Personalised Gift banner** (desktop image, mobile photo, alt text and button label can be replaced from admin through `BANNERS`):
    - **≥760px**: `assets/personalised-banner.jpg` (text baked into the image) at 24px radius, with a **live** "Personalise Your Gift →" link positioned over it at left 24.3% (centred), top 71.8%. Size scales with the banner: width 21.1% and height 4.58% of the banner width, font `max(12px,1.15% of banner width)`. Wine colour; on hover it darkens to `#74283A`, the arrow gap widens and it lifts 2px. Opens WhatsApp.
    - **<760px**: HTML version — eyebrow "Made just for you", H2 "Personalised **Gift**" (gold), "Anti‑Tarnish Jewellery", heart divider, Great Vibes "Personalised with Love", dark pill CTA, and the photo `personalised-gift-box-v2.jpg`.
 6. **New Arrivals**: `isNew` products sorted by `createdAt` descending. "View All →" goes to `/shop?sort=newest`.
@@ -173,7 +175,7 @@ Page titles follow `"{Page} | Aarunya Jewels by Veena"`. The home page title is 
      - Both: uppercase, letter‑spacing .2em.
    - Links: `/shop?sale=1` and `/shop?price=u500`.
    - Below the banners, a **promise strip**: white rounded card (18px) with 4 items, each a 46–64px blush circle with a rose `#A4505C` line icon, a Cormorant 16–20px/600 title and a 12–13.5px muted subtitle. Items: Anti‑Tarnish / Made to keep its shine · Skin Safe / Nickel‑free, gentle on skin · Gift Ready / Beautifully packed with love · Pan India Delivery / Free shipping above ₹499. 1px `rgba(141,53,69,.12)` dividers between items.
-8. **Why Aarunya**: eyebrow + H2 "Small brand, a lot of care". 4 white cards (20px radius, `#F0E2DE` border) with a diamond, a Jost title and a muted text line. 4 columns at ≥900, otherwise 2.
+8. **Why Aarunya**: eyebrow + H2 "Made with care, chosen with love". 4 white cards (20px radius, `#F0E2DE` border) with a diamond, a Jost title and a muted text line. 4 columns at ≥900, otherwise 2.
 9. **Our story**: two offset 3:4 images with asymmetric radii (`20 20 20 80` and `80 20 20 20`).
    - Eyebrow, H2 "Where tradition / *meets everyday*", 2 paragraphs.
    - Gold‑gradient pill "Discover our story →" (`#F6E7C8→#E3C68A`, text `#4A3412`) linking to `/about`.
@@ -283,11 +285,14 @@ Page titles follow `"{Page} | Aarunya Jewels by Veena"`. The home page title is 
 `CONFIG.USE_MOCK` switches between mock data and `API_BASE` (`http://localhost:8080/api`).
 - `GET /products`, `GET /products/{slug}`, `GET /categories`
 - `POST /cart` with `{ items:[{productId, variantId, qty}] }`
-- `POST /orders` with `{ customer, items, subtotal, shipping, giftWrap, giftFee, total }`, returns `{ orderId, status, amount }`
+- `POST /orders` with `{ customer, items, subtotal, shipping, giftWrap, giftFee, total }`, returns `{ orderId, status, amount }`. It must also reduce stock, write a stock ledger entry and save the order for the admin panel (see `CHANGELOG.md`).
+- Banners, offers, announcements, colours, pairings and store settings are edited in admin, so the backend serves them too (see `CHANGELOG.md`).
 - `GET /delivery/estimate?pin=` returns `{ ok, pin, minDays, maxDays, cod }`. Mock rule: Kerala PIN prefixes 67/68/69 take 2–3 days, the rest 4–7.
 - `POST /payments/create` with `{ orderId, amount, provider }`, returns the data the gateway SDK needs.
 
-Data shapes: see `PRODUCTS` (id, slug, name, category, type, popularity, price, mrp, featured, isNew, createdAt, rating, reviewCount, description, material, variants[{id, color, stock, images[3]}]) and `CATEGORIES` (slug, name, short, ph, tint, subs[{slug, name}], image).
+Data shapes: see `PRODUCTS` (id, slug, name, category, type, popularity, price, mrp, featured, isNew, createdAt, rating, reviewCount, description, material, status, variants[{id, sku, color, stock, images[3]}]) and `CATEGORIES` (slug, name, short, ph, tint, subs[{slug, name}], image, pairs). Products with `status: 'draft'` and offers with `hidden: true` are not shown on the store.
+
+The "Admin panel overrides" block in `aarunya-api.js` is prototype‑only. Do not port it.
 
 **Before launch, replace these values** marked REPLACE/REVIEW in the config: `WHATSAPP_NUMBER`, `EMAIL`, `GIFT_WRAP_FEE`, and the policy and content copy.
 

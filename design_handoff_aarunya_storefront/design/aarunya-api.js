@@ -212,6 +212,50 @@ const POLICIES = {
 
 const STATES = ['Andaman and Nicobar Islands','Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand','Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Puducherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'];
 
+// ---- Admin panel overrides (prototype only) ----
+// Aarunya Admin.dc.html saves everything to localStorage `aj_admin_db`. When it exists it replaces the data
+// above, so admin edits show on the store. Production: delete this block; the backend serves the same shapes.
+const DEFAULTS = JSON.parse(JSON.stringify({ PRODUCTS, CATEGORIES, OFFERS, ANNOUNCEMENTS, COLORS, PAIRINGS, CONFIG }));
+let BANNERS = { heroDesktop: '', heroMobile: '', heroAlt: '', personalised: '', personalisedMobile: '', personalisedAlt: '', personalisedCta: '' };
+const ADMIN_KEY = 'aj_admin_db';
+const readAdmin = () => { try { const d = JSON.parse(localStorage.getItem(ADMIN_KEY) || 'null'); return d && d.v === 1 && d.products ? d : null; } catch (e) { return null; } };
+(function applyAdmin() {
+  const db = readAdmin(); if (!db) return;
+  const live = db.products.filter((p) => p.status !== 'draft');
+  PRODUCTS.splice(0, PRODUCTS.length, ...live);
+  CATEGORIES.splice(0, CATEGORIES.length, ...db.categories.map((c) => {
+    const p = live.find((x) => x.category === c.slug);
+    const out = { ...c, image: c.image || (p && p.variants[0] ? p.variants[0].images[0] : '') };
+    if (!c.subs || !c.subs.length) delete out.subs;
+    return out;
+  }));
+  Object.keys(PAIRINGS).forEach((k) => delete PAIRINGS[k]);
+  db.categories.forEach((c) => { if (c.pairs && c.pairs.length) PAIRINGS[c.slug] = c.pairs; });
+  if (db.offers) OFFERS.splice(0, OFFERS.length, ...db.offers.filter((o) => !o.hidden));
+  if (db.announcements && db.announcements.length) ANNOUNCEMENTS.splice(0, ANNOUNCEMENTS.length, ...db.announcements);
+  if (db.colors) { Object.keys(COLORS).forEach((k) => delete COLORS[k]); Object.assign(COLORS, db.colors); }
+  if (db.config) ['WHATSAPP_NUMBER', 'EMAIL', 'INSTAGRAM_HANDLE', 'FREE_SHIPPING_THRESHOLD', 'SHIPPING_FEE', 'GIFT_WRAP_FEE', 'DISPATCH_CUTOFF_HOUR', 'PAYMENT_PROVIDER'].forEach((k) => { if (db.config[k] !== undefined && db.config[k] !== '') CONFIG[k] = db.config[k]; });
+  if (db.banners) BANNERS = { ...BANNERS, ...db.banners };
+})();
+// Mock checkout: writes the order into the admin data and reduces stock, so it appears in Admin > Orders.
+function recordOrder(order) {
+  const db = readAdmin();
+  let orderId = 'AJ' + String(Date.now()).slice(-6);
+  if (db && db.orders) {
+    const max = db.orders.filter((o) => o.channel === 'online').reduce((m, o) => Math.max(m, parseInt(String(o.id).slice(2), 10) || 0), 1000);
+    orderId = 'AJ' + (max + 1);
+    const now = new Date().toISOString(); const c = order.customer || {};
+    const items = (order.items || []).map((l) => {
+      const p = db.products.find((x) => x.id === l.productId); const vr = p && p.variants.find((x) => x.id === l.variantId);
+      if (vr) { vr.stock = Math.max(0, vr.stock - l.qty); db.ledger.unshift({ at: now, pid: p.id, vid: vr.id, sku: vr.sku, name: p.name, color: vr.color, change: -l.qty, reason: 'online', ref: orderId, note: '' }); }
+      return { pid: l.productId, vid: l.variantId, name: p ? p.name : l.productId, color: vr ? vr.color : '', sku: vr ? vr.sku : '', qty: l.qty, price: p ? p.price : 0, img: (vr && vr.images[0]) || '' };
+    });
+    db.orders.unshift({ id: orderId, channel: 'online', createdAt: now, customer: { name: c.name || '', phone: c.phone || '', email: c.email || '', address: [c.house, c.address, c.landmark].filter(Boolean).join(', '), city: c.city || '', state: c.state || '', pin: c.pin || '' }, items, subtotal: order.subtotal, shipping: order.shipping, giftWrap: !!order.giftWrap, giftFee: order.giftFee || 0, discount: 0, total: order.total, payment: { status: 'pending', method: 'Online', provider: CONFIG.PAYMENT_PROVIDER }, status: 'new', shipment: null, location: '', note: '', history: [{ at: now, status: 'new', note: 'Order placed on website' }] });
+    try { localStorage.setItem(ADMIN_KEY, JSON.stringify(db)); } catch (e) {}
+  }
+  return { orderId, status: 'CREATED', amount: order.total };
+}
+
 // ---- HTTP + service layer ----
 async function http(path, { method = 'GET', body } = {}) {
   const res = await fetch(CONFIG.API_BASE + path, {
@@ -236,7 +280,7 @@ const api = {
   syncCart: (items) => CONFIG.USE_MOCK ? mock({ ok: true }) : http('/cart', { method: 'POST', body: { items } }),
   // POST /orders — { customer, items, subtotal, shipping, total }
   createOrder: (order) => CONFIG.USE_MOCK
-    ? mock({ orderId: 'AJ' + String(Date.now()).slice(-6), status: 'CREATED', amount: order.total })
+    ? mock(recordOrder(order))
     : http('/orders', { method: 'POST', body: order }),
   // GET /delivery/estimate?pin=XXXXXX — mock: Kerala PINs 2–3 days, rest of India 4–7 days.
   checkDelivery: (pin) => CONFIG.USE_MOCK
@@ -255,5 +299,5 @@ const calcShipping = (subtotal) =>
 const whatsappUrl = (text = CONFIG.WHATSAPP_TEXT) =>
   `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 
-window.AarunyaAPI = { ANNOUNCEMENTS, OFFERS, PAIRINGS, CONFIG, COLORS, CATEGORIES, PRODUCTS, CONTENT, POLICIES, STATES, api, calcShipping, whatsappUrl };
+window.AarunyaAPI = { DEFAULTS, BANNERS, ANNOUNCEMENTS, OFFERS, PAIRINGS, CONFIG, COLORS, CATEGORIES, PRODUCTS, CONTENT, POLICIES, STATES, api, calcShipping, whatsappUrl };
 })();
