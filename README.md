@@ -12,7 +12,14 @@ npm run dev      # http://localhost:5173
 npm run build    # typecheck + production bundle into dist/
 npm run preview  # serve the built bundle
 npm run typecheck
+npm run test:flows   # scenario tests, driven through a real browser
 ```
+
+`test:flows` resets the store, checks the shop behaves on an empty catalogue, then stocks
+it through the API and walks a shopper's journey: browsing, a draft product staying
+hidden, a sold-out colour disabling Add to cart, the cart and its shipping threshold,
+checkout validation, placing an order, and tracking it with the code issued at checkout.
+It launches headless Chrome itself and fails on any console error or failing API call.
 
 ## Stack
 
