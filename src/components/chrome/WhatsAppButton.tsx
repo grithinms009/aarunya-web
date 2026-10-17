@@ -1,3 +1,4 @@
+import { SUPPORT } from '@/config/businessInfo';
 import { whatsappUrl } from '@/lib/format';
 import { useViewport } from '@/hooks/useViewport';
 import { WhatsAppIcon } from '@/components/ui/icons';
@@ -6,6 +7,10 @@ import s from './WhatsAppButton.module.css';
 /** Bottom-right floating button. The "Chat with us" label shows on desktop only, and the
  *  button lifts above the sticky PDP bar on mobile product pages. */
 export function WhatsAppButton({ liftedForStickyBar }: { liftedForStickyBar: boolean }) {
+  /* Hidden until the merchant confirms the number is WhatsApp Business enabled. A link
+     that opens a chat with nobody is worse than no link at all. */
+  if (!SUPPORT.whatsapp) return null;
+
   const { isDesktop } = useViewport();
   const showLabel = isDesktop;
 

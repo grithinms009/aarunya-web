@@ -73,13 +73,15 @@ export function Grievance() {
 
       <Section h="What happens next">
         <P>
-          Your complaint is acknowledged and then investigated by the person named above,
-          who will write back to you with an outcome and an explanation.
+          {GRIEVANCE.name ?? 'The owner'} reads the complaint personally, looks into what
+          happened, and writes back to you with an outcome and an explanation. Aarunya is
+          a small shop: the person who answers your complaint is the person who runs it.
         </P>
         <P>
-          The acknowledgement and resolution timescales for this page have not been
-          confirmed yet. We would rather leave them blank than publish a commitment the
-          shop has not agreed to.
+          We have not published a fixed acknowledgement or resolution deadline, because we
+          would rather not commit to a timescale we cannot be certain of keeping. We aim to
+          come back to you quickly, and we will tell you if something is going to take
+          longer than expected.
         </P>
       </Section>
 

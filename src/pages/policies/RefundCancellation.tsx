@@ -10,7 +10,7 @@
  * admin's own return flow and Indian consumer law.
  */
 import { P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
-import { PAYMENTS, RETURNS, SUPPORT } from '@/config/businessInfo';
+import { PAYMENTS, RETURNS, SHIPPING, SUPPORT } from '@/config/businessInfo';
 
 export function RefundCancellation() {
   const window =
@@ -41,18 +41,38 @@ export function RefundCancellation() {
     >
       <Section h="Cancelling before dispatch" id="before">
         <P>
-          You can cancel <Detail value={RETURNS.cancellationCutoff} what="cancellation cut-off" />
-          . Message us with your order number as soon as you can and we will stop the parcel
-          and refund you in full, including any delivery charge.
+          You can ask us to cancel{' '}
+          <strong>
+            <Detail value={RETURNS.cancellationCutoff} what="cancellation cut-off" />
+          </strong>
+          .
+        </P>
+        <P>
+          Cancellation is by request, not a button: email{' '}
+          <Detail value={SUPPORT.email} what="support email" /> — or use the{' '}
+          <PolicyLink to="/contact-us">contact form</PolicyLink> — with your order number
+          and a line saying you would like to cancel. We will reply to confirm whether the
+          order was stopped in time.
+        </P>
+        <P>
+          Once we confirm the cancellation, we refund you in full, including any delivery
+          charge, by the route described below. Until you have that confirmation from us,
+          please assume the order is still on its way.
         </P>
       </Section>
 
       <Section h="Cancelling after dispatch" id="after">
         <P>
-          Once a parcel is with the courier we cannot recall it. Please refuse the delivery
-          or contact us when it arrives, and we will treat it as a return. Where an order is
-          cancelled after dispatch rather than being faulty, the original delivery charge is
-          not refunded.
+          Once a parcel has been handed to {SHIPPING.courier} we cannot recall it, even
+          within the cancellation window. At that point the{' '}
+          <PolicyLink to="/returns-and-replacements">
+            returns and replacement process
+          </PolicyLink>{' '}
+          applies instead, where it is applicable to your situation.
+        </P>
+        <P>
+          Where an order is sent back because you changed your mind rather than because
+          anything was wrong with it, the original delivery charge is not refunded.
         </P>
       </Section>
 
@@ -109,14 +129,19 @@ export function RefundCancellation() {
 
       <Section h="How long a refund takes" id="timeline">
         <P>
-          Once a refund is approved we initiate it within{' '}
-          <Detail value={RETURNS.refundInitiationDays} what="refund initiation time" />.
+          Once the conditions for a refund are met and we have approved it, our target is
+          to start processing it within{' '}
+          <strong>
+            <Detail value={RETURNS.refundInitiationDays} what="refund initiation time" />
+          </strong>
+          .
         </P>
         <P>
-          After that, how quickly it appears depends on your bank or UPI app, typically{' '}
+          Crediting it back to you is then down to {PAYMENTS.gateway}, the payment method
+          you used and your bank — typically{' '}
           <Detail value={RETURNS.refundCompletionDays} what="typical bank credit time" />.
-          That last step is not something we control. We will always send you the refund
-          reference so you can trace it with your bank.
+          We cannot give you an exact date for that step, because it is not ours to give.
+          We will always send you the refund reference so you can trace it with your bank.
         </P>
         <P>
           If a refund has not arrived after that, contact us at{' '}

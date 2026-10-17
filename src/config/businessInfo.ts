@@ -15,12 +15,12 @@ import { CONFIG } from '@/data/config';
 /** A fact the merchant must confirm. `null` until they do. */
 export type Supplied<T> = T | null;
 
-/* The seeded defaults that ship with a fresh install. They are examples, not facts, so
-   they are treated as missing until the merchant replaces them in Settings. */
+/* Example values that shipped with earlier installs. They are not facts, so anything
+   still set to one of them is treated as missing until replaced in Settings. The real
+   contact details are seeded now, so this list only guards against an old database. */
 const SEEDED_PLACEHOLDERS = new Set([
   '919876543210',
   'hello@aarunyajewels.in',
-  'aarunyajewelsbyveena',
 ]);
 
 /** Returns the value only if it is a real, merchant-supplied one. */
@@ -55,9 +55,15 @@ export const BRAND_NAME = 'Aarunya Jewels by Veena';
  * private limited company, a GST-registered entity or a certified jeweller.
  */
 export const MERCHANT = {
-  /** e.g. the proprietor's full legal name, as it appears on their bank account. */
-  legalName: null as Supplied<string>,
-  /** e.g. 'Sole proprietorship'. */
+  /** The owner's name, as supplied by the merchant. */
+  legalName: 'Veena G' as Supplied<string>,
+  /**
+   * How the business is constituted, e.g. 'Sole proprietorship'.
+   *
+   * Still null on purpose: the shop is not registered as a company, but the merchant has
+   * not confirmed the exact wording to use, and inventing a legal status is precisely the
+   * kind of claim that must not appear. The pages read correctly without it.
+   */
   constitution: null as Supplied<string>,
   /** Set only if the merchant actually holds one; leave null otherwise. */
   gstin: null as Supplied<string>,
@@ -65,16 +71,21 @@ export const MERCHANT = {
 
 /** The real operating address, also used as the return address. */
 export const ADDRESS: PostalAddress = {
-  line1: null,
-  line2: null,
-  city: null,
-  /* The shop operates from Kerala; the rest of the address still needs confirming. */
+  line1: 'Pulickatharayil, Edappon',
+  line2: 'Ayranikudy P.O.',
+  city: 'Mavelikara, Alappuzha District',
   state: 'Kerala',
-  pin: null,
+  pin: '690558',
   country: 'India',
 };
 
-/** The primary production domain. Only one, so canonical URLs stay unambiguous. */
+/**
+ * The primary production domain. Only one, so canonical URLs stay unambiguous.
+ *
+ * Still null: the shop holds both aarunyajewelsbyveena.com and .in, and which one serves
+ * as primary has not been confirmed. Until it is, no canonical tag is emitted — better
+ * than naming the wrong one and splitting the site across two canonical hosts.
+ */
 export const PRIMARY_DOMAIN: Supplied<string> = null;
 
 /* ------------------------------------------------------------------ support */
@@ -84,26 +95,49 @@ export const SUPPORT = {
   get email(): Supplied<string> {
     return supplied(CONFIG.EMAIL);
   },
-  get whatsapp(): Supplied<string> {
-    return supplied(CONFIG.WHATSAPP_NUMBER);
-  },
   get instagram(): Supplied<string> {
     return supplied(CONFIG.INSTAGRAM_HANDLE);
   },
-  /** A phone line answered during the hours below. */
-  phone: null as Supplied<string>,
-  /** e.g. 'Monday to Saturday'. */
-  days: null as Supplied<string>,
-  /** e.g. '10:00 am to 6:00 pm IST'. */
-  hours: null as Supplied<string>,
+  /** The customer support line. */
+  phone: '+91 97477 38193' as Supplied<string>,
+  /** Tel: href form — digits and a leading +, nothing else. */
+  phoneHref: '+919747738193',
+
+  /**
+   * WhatsApp is shown only once the merchant confirms this number is WhatsApp Business
+   * enabled. The number is the same support line, but a WhatsApp link that goes nowhere
+   * is worse than no link, so every WhatsApp affordance on the site is gated on this.
+   */
+  whatsappConfirmed: false,
+  get whatsapp(): Supplied<string> {
+    return this.whatsappConfirmed ? supplied(CONFIG.WHATSAPP_NUMBER) : null;
+  },
+
+  /**
+   * Messages can be sent at any hour. Deliberately not phrased as a response-time
+   * promise: the merchant has not committed to one, and "we reply within 24 hours" is
+   * a commitment a gateway and a customer will both hold the shop to.
+   */
+  days: 'Any day' as Supplied<string>,
+  hours: 'messages accepted 24/7' as Supplied<string>,
+  /** Sets expectations without promising a deadline. */
+  responseNote:
+    'Messages reach us at any time and are answered as quickly as we can, usually within '
+    + 'a working day. Calls are best during daytime hours, IST.',
 };
 
 /** Named person who handles complaints and escalations. Never invent this. */
 export const GRIEVANCE: GrievanceOfficer = {
-  name: null,
-  designation: null,
-  email: null,
-  phone: null,
+  name: 'Veena G',
+  designation: 'Owner',
+  /* The same channels as support: a one-person shop, stated honestly rather than
+     dressed up as a separate department. */
+  get email(): Supplied<string> {
+    return SUPPORT.email;
+  },
+  get phone(): Supplied<string> {
+    return SUPPORT.phone;
+  },
 };
 
 /* ------------------------------------------------------------------ operations */
@@ -130,10 +164,27 @@ export const SHIPPING = {
    * that is what is stated to customers.
    */
   thresholdBasis: 'the item subtotal after any discount, before shipping and gift wrap',
-  /** Working days between payment and handover to India Post. Merchant to confirm. */
-  processingDays: null as Supplied<string>,
-  /** Typical India Post transit, e.g. '3 to 7 working days'. Merchant to confirm. */
-  deliveryWindow: null as Supplied<string>,
+  /**
+   * Business days between order confirmation and handover to India Post. This is dispatch
+   * time, which is counted separately from transit — the two are never added together or
+   * quoted as one "delivery time", because a customer reading a single number will take
+   * it as a delivery date.
+   */
+  processingDays: '2 to 4 business days' as Supplied<string>,
+
+  /** Transit after dispatch, which differs sharply inside and outside the home state. */
+  transit: {
+    local: '1 to 3 days',
+    rest: '3 to 10 days',
+    /** The state the shorter window applies to. */
+    localLabel: 'Kerala',
+  },
+
+  /** A single phrase for places that can only show one window. */
+  get deliveryWindow(): Supplied<string> {
+    return `${this.transit.local} within ${this.transit.localLabel}, `
+      + `${this.transit.rest} elsewhere in India, after dispatch`;
+  },
 };
 
 /** Returns, replacements, cancellations and refunds. */
@@ -142,14 +193,29 @@ export const RETURNS = {
   get windowDays(): number {
     return Number(CONFIG.returnWindow) || 0;
   },
-  /** When a customer can still cancel, e.g. 'any time before the parcel is dispatched'. */
-  cancellationCutoff: null as Supplied<string>,
-  /** Working days from approval to the refund being initiated. Merchant to confirm. */
-  refundInitiationDays: null as Supplied<string>,
-  /** Typical time for the bank or UPI app to credit it back. Merchant to confirm. */
-  refundCompletionDays: null as Supplied<string>,
-  /** Who pays return postage, and when. Merchant to confirm. */
-  returnShipping: null as Supplied<string>,
+  /** How long a customer has to ask for a cancellation, and the condition on it. */
+  cancellationCutoff:
+    'within one business day of placing the order, as long as it has not already been '
+    + 'dispatched' as Supplied<string>,
+
+  /** Business days from approval to the refund being initiated with Razorpay. */
+  refundInitiationDays: '3 to 5 business days' as Supplied<string>,
+
+  /**
+   * Deliberately not a number of days. Once a refund is initiated the timing belongs to
+   * Razorpay, the payment method and the customer's bank, so the site describes that
+   * rather than promising a credit date it does not control.
+   */
+  refundCompletionDays:
+    'a further few days, depending on your bank and payment method' as Supplied<string>,
+
+  /** Who pays return postage. Discretionary returns differ from genuine faults. */
+  returnShipping:
+    'Where a return is accepted at our discretion — you changed your mind, or the piece '
+    + 'is not what you hoped for — the return postage is yours. Where the piece is '
+    + 'defective, damaged, incorrect or something is missing, you should not be out of '
+    + 'pocket: we cover the return, and we will tell you how to send it before you post '
+    + 'anything.' as Supplied<string>,
   /** Whether an unboxing video is required for a damage claim. From store settings. */
   get requiresUnboxingVideo(): boolean {
     return CONFIG.requireVideo !== false;
@@ -163,7 +229,7 @@ export const PAYMENTS = {
 };
 
 /** Shown as "Last updated" on every policy page. Bump when policy wording changes. */
-export const POLICIES_UPDATED: Supplied<string> = null;
+export const POLICIES_UPDATED: Supplied<string> = '17 October 2026';
 
 /* ------------------------------------------------------------------ readiness */
 

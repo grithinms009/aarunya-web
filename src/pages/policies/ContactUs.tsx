@@ -1,8 +1,8 @@
 /* Contact Us.
  *
  * The form posts to POST /api/contact, which stores the message server-side. It reports
- * success only when the API returns one — a failure says so and offers WhatsApp and email
- * instead, rather than showing a reassuring tick over a message that went nowhere.
+ * success only when the API returns one — a failure says so and points at the email and
+ * phone instead, rather than showing a reassuring tick over a message that went nowhere.
  */
 import { useState } from 'react';
 import { P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
@@ -83,7 +83,7 @@ export function ContactUs() {
     <PolicyPage
       title="Contact Us"
       path="/contact-us"
-      description={`Reach ${BRAND_NAME} by email, phone or WhatsApp, and see our operating address and support hours.`}
+      description={`Reach ${BRAND_NAME} by email or phone, and see our correspondence address and how we handle messages.`}
       intro={<P>Questions about an order, a piece, or anything else — we read everything ourselves.</P>}
     >
       <Section h="How to reach us">
@@ -101,22 +101,20 @@ export function ContactUs() {
             <strong style={{ color: INK }}>Phone</strong>
             <br />
             {SUPPORT.phone ? (
-              <a href={`tel:${SUPPORT.phone}`} style={{ color: MUTED }}>{SUPPORT.phone}</a>
+              <a href={`tel:${SUPPORT.phoneHref}`} style={{ color: MUTED }}>{SUPPORT.phone}</a>
             ) : (
               <Detail value={null} what="support phone number" />
             )}
           </li>
-          <li>
-            <strong style={{ color: INK }}>WhatsApp</strong>
-            <br />
-            {SUPPORT.whatsapp ? (
+          {SUPPORT.whatsapp && (
+            <li>
+              <strong style={{ color: INK }}>WhatsApp</strong>
+              <br />
               <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" style={{ color: MUTED }}>
                 Message us on WhatsApp
               </a>
-            ) : (
-              <Detail value={null} what="WhatsApp Business number" />
-            )}
-          </li>
+            </li>
+          )}
           {SUPPORT.instagram && (
             <li>
               <strong style={{ color: INK }}>Instagram</strong>
@@ -130,10 +128,10 @@ export function ContactUs() {
       </Section>
 
       <Section h="When we are available">
-        <P>
-          <Detail value={SUPPORT.days} what="support days" /> ,{' '}
-          <Detail value={SUPPORT.hours} what="support hours" />. Messages sent outside those
-          hours are answered the next working day.
+        <P>{SUPPORT.responseNote}</P>
+        <P style={{ fontSize: 13.5 }}>
+          We are a small shop, so replies come from a person rather than a desk — we have
+          not set a guaranteed response time we might not be able to keep.
         </P>
       </Section>
 
@@ -147,8 +145,9 @@ export function ContactUs() {
           <PolicyLink to="/returns-and-replacements">Returns and Replacements</PolicyLink>.
         </P>
         <P style={{ fontSize: 13.5 }}>
-          We are an online shop operating from {ADDRESS.state}; the address above is our
-          operating and return address, not a walk-in showroom.
+          We are an online shop operating from {ADDRESS.state}; this is our correspondence
+          and return address, not a walk-in showroom. Please do not post anything back
+          before we have confirmed a return.
         </P>
       </Section>
 
@@ -218,7 +217,8 @@ export function ContactUs() {
                 <strong style={{ color: '#8A2E22', display: 'block', marginBottom: 4 }}>
                   Your message was not sent.
                 </strong>
-                {failure} Please try again, or reach us on WhatsApp or by email instead.
+                {failure} Please try again, or email or call us instead — the details are
+                above.
               </div>
             )}
 

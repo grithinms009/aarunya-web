@@ -38,12 +38,11 @@ export function AboutUs() {
 
       <Section h="Who runs it">
         <P>
-          The shop is run by{' '}
-          <Detail value={MERCHANT.legalName} what="proprietor's legal name" />, trading as{' '}
-          {BRAND_NAME} — a{' '}
-          <Detail value={MERCHANT.constitution} what="business constitution" /> based in{' '}
-          {ADDRESS.state}. Orders are packed and posted by the same small team that answers
-          your messages.
+          The shop is owned and run by{' '}
+          <Detail value={MERCHANT.legalName} what="owner's name" />, trading as {BRAND_NAME}
+          {MERCHANT.constitution ? `, a ${MERCHANT.constitution}` : ''} from {ADDRESS.city},{' '}
+          {ADDRESS.state}. Orders are packed and posted by the same person who answers your
+          messages.
         </P>
       </Section>
 
@@ -63,8 +62,8 @@ export function AboutUs() {
       <Section h="Talk to us">
         <P>
           Questions about a piece, an order, or whether something will suit an occasion —
-          write to <Detail value={SUPPORT.email} what="support email" /> or message us on
-          WhatsApp. Full details are on our{' '}
+          write to <Detail value={SUPPORT.email} what="support email" /> or call{' '}
+          <Detail value={SUPPORT.phone} what="support phone" />. Everything is on our{' '}
           <PolicyLink to="/contact-us">Contact Us</PolicyLink> page.
         </P>
       </Section>

@@ -41,12 +41,12 @@ export function Terms() {
       <Section h="Who we are" id="who-we-are">
         <P>
           This website is owned and operated by{' '}
-          <Detail value={MERCHANT.legalName} what="proprietor's legal name" />, trading as{' '}
-          {BRAND_NAME}, a <Detail value={MERCHANT.constitution} what="business constitution" />{' '}
-          based in {ADDRESS.state}, {ADDRESS.country}.
+          <Detail value={MERCHANT.legalName} what="owner's name" />, trading as {BRAND_NAME}
+          {MERCHANT.constitution ? `, a ${MERCHANT.constitution},` : ','} based in{' '}
+          {ADDRESS.state}, {ADDRESS.country}.
         </P>
         <P>
-          Our operating and return address is{' '}
+          Our correspondence and return address is{' '}
           <Detail value={addressLine()} what="full operating address" />. You can reach us at{' '}
           <Detail value={SUPPORT.email} what="support email" /> or{' '}
           <Detail value={SUPPORT.phone} what="support phone" />.

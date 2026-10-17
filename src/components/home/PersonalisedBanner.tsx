@@ -1,6 +1,7 @@
 import { useViewport } from '@/hooks/useViewport';
 import { whatsappUrl } from '@/lib/format';
 import { BANNERS } from '@/data/config';
+import { SUPPORT } from '@/config/businessInfo';
 import s from './PersonalisedBanner.module.css';
 
 const FALLBACK_ALT =
@@ -18,7 +19,8 @@ export function PersonalisedBanner() {
   const alt = BANNERS.personalisedAlt || FALLBACK_ALT;
   const cta = BANNERS.personalisedCta || 'Personalise Your Gift';
   const { w } = useViewport();
-  const href = whatsappUrl();
+  /* Until WhatsApp is confirmed, the CTA goes to Contact Us rather than a dead chat. */
+  const href = SUPPORT.whatsapp ? whatsappUrl() : '/contact-us';
 
   return (
     <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>

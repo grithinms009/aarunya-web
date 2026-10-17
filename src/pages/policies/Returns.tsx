@@ -75,23 +75,30 @@ export function Returns() {
       </Section>
 
       <Section h="What we need from you" id="evidence">
+        <P>Please send us:</P>
         <List
           items={[
             'Your order number.',
-            'Clear photographs of the piece showing the problem.',
-            'A photograph of the packaging if the parcel arrived damaged.',
-            ...(RETURNS.requiresUnboxingVideo
-              ? ['An unboxing video — one continuous recording from before you open the sealed parcel.']
-              : []),
+            'Which piece it is, and how many.',
+            'What the problem is, in your own words.',
+            'Clear photographs showing it, including the packaging if the parcel arrived damaged.',
+            <>
+              An <strong>unedited video of the parcel being opened</strong>, where you have
+              one — a single continuous recording started before the seal is broken.
+            </>,
           ]}
         />
-        {RETURNS.requiresUnboxingVideo && (
-          <P>
-            The unboxing video is how we tell a transit problem from a packing one, and it
-            is what lets us settle a claim with the courier quickly. Please start recording
-            before you break the seal.
-          </P>
-        )}
+        <P>
+          The opening video is the single most useful thing you can send, especially for a
+          damaged, missing or incorrect item: it is how we tell a transit problem from a
+          packing one, and it lets us settle a claim with {SHIPPING.courier} quickly. We
+          ask for it strongly, and getting into the habit of recording is worth it.
+        </P>
+        <P>
+          Not having one does not automatically end the matter, and it does not take away
+          any right you have under consumer law. We will still look at your request on
+          what you can show us — it may simply take longer to resolve.
+        </P>
       </Section>
 
       <Section h="Condition of the item" id="condition">
@@ -117,25 +124,21 @@ export function Returns() {
 
       <Section h="How to raise a request" id="how">
         <P>
-          Message us at <Detail value={SUPPORT.email} what="support email" />, or on
-          WhatsApp, with your order number and the photographs. You can also use the
-          Request Replacement button on your order in{' '}
-          <PolicyLink to="/track-order">Track Order</PolicyLink>, which sends us the same
-          details.
+          Email <Detail value={SUPPORT.email} what="support email" />, use the{' '}
+          <PolicyLink to="/contact-us">contact form</PolicyLink>, or use the Request
+          Replacement button on your order in{' '}
+          <PolicyLink to="/track-order">Track Order</PolicyLink> — whichever is easiest.
         </P>
         <P>
-          We will confirm whether it is approved before you send anything back — please do
-          not post an item to us until we have.
+          We review every request ourselves, against what you have sent us, and write back
+          to tell you the outcome and what happens next. Please wait for that before
+          posting anything back to us.
         </P>
       </Section>
 
       <Section h="Return postage" id="postage">
         <P>
           <Detail value={RETURNS.returnShipping} what="who pays return postage, and when" />
-        </P>
-        <P>
-          Where the fault is ours — damaged, faulty, wrong or missing — you should not be
-          out of pocket for sending it back or for us resending it.
         </P>
         <P>
           Our return address is <Detail value={addressLine()} what="full return address" />.

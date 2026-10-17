@@ -11,17 +11,25 @@ import { readFileSync } from 'node:fs';
    declarations: a field counts as supplied once its `null` is replaced by a string. */
 const src = readFileSync(new URL('../src/config/businessInfo.ts', import.meta.url), 'utf8');
 
-/** True when `field:` is still declared as null (ignoring any `as Type` in between). */
+/**
+ * True when a field is still unconfirmed.
+ *
+ * A field counts as supplied when it is given a string, a getter that builds one, or
+ * `true`. It counts as missing when it is `null`, `false`, or absent from the file
+ * altogether — absence is treated as missing rather than silently passing.
+ */
 const isNull = (field) => {
-  const re = new RegExp(`\\b${field}\\s*:\\s*(?:[^,;\\n]*?\\bas\\b[^,;\\n]*?=\\s*)?(null|'[^']*'|"[^"]*")`);
+  const getter = new RegExp(`\\bget ${field}\\s*\\(`);
+  if (getter.test(src)) return false;
+  const re = new RegExp(`\\b${field}\\s*(?::[^=,;\\n]*)?[:=]\\s*(null|false|true|'[^']*'|"[^"]*"|\\s*$)`);
   const m = re.exec(src);
-  /* A field that is not found at all is treated as missing, not as passing. */
-  return !m || m[1] === 'null';
+  if (!m) return true;
+  const v = m[1].trim();
+  return v === 'null' || v === 'false';
 };
 
 const BLOCKING = [
   ['legalName', 'Proprietor’s full legal name — for Terms and the Razorpay application'],
-  ['constitution', 'How the business is constituted, e.g. "Sole proprietorship"'],
   ['line1', 'Street address — shown on Contact, used as the return address'],
   ['city', 'City or town of the operating address'],
   ['pin', 'PIN code of the operating address'],
@@ -40,10 +48,27 @@ const BLOCKING = [
   ['POLICIES_UPDATED', 'The date the merchant approved this policy wording'],
 ];
 
+/* Not launch-blocking: the site reads correctly without these, but each one changes what
+   customers see, so they are reported rather than left silent. */
+const ADVISORY = [
+  ['constitution', 'Whether to state a business constitution, e.g. "Sole proprietorship"'],
+  ['whatsappConfirmed', 'Confirm +91 97477 38193 is WhatsApp Business enabled — every WhatsApp link stays hidden until then'],
+  ['gstin', 'Only if one is actually held; leave unset otherwise'],
+];
+
 const missing = BLOCKING.filter(([field]) => isNull(field));
+
+const advisory = ADVISORY.filter(([field]) => isNull(field));
+
+const reportAdvisory = () => {
+  if (!advisory.length) return;
+  console.log(`\n${advisory.length} detail(s) still to confirm (not launch-blocking):\n`);
+  for (const [field, why] of advisory) console.log(`  · ${field.padEnd(22)} ${why}`);
+};
 
 if (missing.length === 0) {
   console.log('All launch-blocking business details are supplied.');
+  reportAdvisory();
   process.exit(0);
 }
 
@@ -51,6 +76,7 @@ console.error(`\n${missing.length} business detail(s) still to confirm before la
 for (const [field, why] of missing) {
   console.error(`  · ${field.padEnd(22)} ${why}`);
 }
+reportAdvisory();
 console.error(`
 They live in src/config/businessInfo.ts.
 

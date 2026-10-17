@@ -59,19 +59,31 @@ export function Shipping() {
 
       <Section h="Dispatch and delivery times" id="dispatch">
         <P>
-          Orders are packed and handed to {SHIPPING.courier} within{' '}
-          <Detail value={SHIPPING.processingDays} what="processing time in working days" />{' '}
-          of payment being confirmed.
+          These are two separate things, and we quote them separately rather than adding
+          them into one number.
         </P>
         <P>
-          {SHIPPING.courier} usually delivers within{' '}
-          <Detail value={SHIPPING.deliveryWindow} what="estimated delivery window" /> after
-          that, depending on your PIN code.
+          <strong>Dispatch.</strong> We pack your order and hand it to {SHIPPING.courier}{' '}
+          within <strong>{SHIPPING.processingDays}</strong> of the order being confirmed.
         </P>
         <P>
-          These are estimates based on normal conditions, not guarantees. Public holidays,
-          festival periods, weather and courier backlogs can all add time, and once a
-          parcel is with {SHIPPING.courier} its progress is outside our control.
+          <strong>Delivery.</strong> After dispatch, {SHIPPING.courier} typically takes:
+        </P>
+        <List
+          items={[
+            <>
+              <strong>{SHIPPING.transit.local}</strong> within {SHIPPING.transit.localLabel}.
+            </>,
+            <>
+              <strong>{SHIPPING.transit.rest}</strong> elsewhere in India.
+            </>,
+          ]}
+        />
+        <P>
+          Both are estimates, not guaranteed delivery dates. Serviceability at your PIN
+          code, public holidays, festival periods, weather and postal backlogs can all add
+          time, and once a parcel is with {SHIPPING.courier} its progress is outside our
+          control.
         </P>
       </Section>
 

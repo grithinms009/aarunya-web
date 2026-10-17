@@ -4,6 +4,7 @@ import { useCatalog } from '@/hooks/useCatalog';
 import { categoryHref, hasSubs } from '@/lib/catalog';
 import { routeNameOf, type RouteName } from '@/lib/route';
 import { instagramUrl, whatsappUrl } from '@/lib/format';
+import { SUPPORT } from '@/config/businessInfo';
 import { CONFIG } from '@/data/config';
 import { useUi } from '@/store/useStore';
 import { ChevronIcon, CloseIcon } from '@/components/ui/icons';
@@ -133,15 +134,25 @@ export function MobileMenu() {
         </nav>
 
         <div className={s.menuFooter}>
-          <a
-            href={whatsappUrl()}
-            target="_blank"
-            rel="noopener"
-            className={s.menuCta}
-            style={{ background: '#8D3545', color: '#FFF9F6' }}
-          >
-            Chat on WhatsApp
-          </a>
+          {SUPPORT.whatsapp ? (
+            <a
+              href={whatsappUrl()}
+              target="_blank"
+              rel="noopener"
+              className={s.menuCta}
+              style={{ background: '#8D3545', color: '#FFF9F6' }}
+            >
+              Chat on WhatsApp
+            </a>
+          ) : (
+            <Link
+              to="/contact-us"
+              className={s.menuCta}
+              style={{ background: '#8D3545', color: '#FFF9F6' }}
+            >
+              Contact us
+            </Link>
+          )}
           <a
             href={instagramUrl()}
             target="_blank"

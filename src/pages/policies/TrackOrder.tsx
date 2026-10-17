@@ -215,7 +215,7 @@ export function TrackOrder() {
         <P>
           It is in the confirmation we showed you after payment. If you cannot find it,
           write to {SUPPORT.email ?? 'our support address'} from the email address on the
-          order, or message us on WhatsApp with your order number, and we will send it
+          order, or call {SUPPORT.phone ?? 'our support number'}, and we will send it
           again. We cannot show order details to someone who only has an order number.
         </P>
       </Section>

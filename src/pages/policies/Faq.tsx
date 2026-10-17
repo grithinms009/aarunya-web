@@ -197,8 +197,8 @@ export function Faq() {
         <Faq1 q="How do I contact you?">
           <P>
             Email <Detail value={SUPPORT.email} what="support email" />, call{' '}
-            <Detail value={SUPPORT.phone} what="support phone" />, or message us on WhatsApp.
-            Hours and the full address are on{' '}
+            <Detail value={SUPPORT.phone} what="support phone" />, or use the contact form.
+            The full address is on{' '}
             <PolicyLink to="/contact-us">Contact Us</PolicyLink>.
           </P>
         </Faq1>

@@ -50,9 +50,11 @@ export function Footer() {
             <a href={instagramUrl()} target="_blank" rel="noopener" className={s.social}>
               Instagram
             </a>
-            <a href={whatsappUrl()} target="_blank" rel="noopener" className={s.social}>
-              WhatsApp
-            </a>
+            {SUPPORT.whatsapp && (
+              <a href={whatsappUrl()} target="_blank" rel="noopener" className={s.social}>
+                WhatsApp
+              </a>
+            )}
           </div>
         </div>
 
@@ -86,7 +88,7 @@ export function Footer() {
             <a href={`mailto:${SUPPORT.email}`} className={s.colLink}>{SUPPORT.email}</a>
           )}
           {SUPPORT.phone && (
-            <a href={`tel:${SUPPORT.phone}`} className={s.colLink}>{SUPPORT.phone}</a>
+            <a href={`tel:${SUPPORT.phoneHref}`} className={s.colLink}>{SUPPORT.phone}</a>
           )}
           {addressLine() && (
             <span className={s.colLink} style={{ cursor: 'default', lineHeight: 1.6 }}>
