@@ -1,8 +1,9 @@
 import { useViewport } from '@/hooks/useViewport';
 import { whatsappUrl } from '@/lib/format';
+import { BANNERS } from '@/data/config';
 import s from './PersonalisedBanner.module.css';
 
-const BANNER_ALT =
+const FALLBACK_ALT =
   'Made just for you. Personalised Gift, anti-tarnish jewellery, personalised with love. Cream jewellery box engraved with Aarunya, holding gold necklaces and rings.';
 
 /** At >=760px the banner is the supplied artwork (heading baked in) with a live, positioned
@@ -12,6 +13,10 @@ const BANNER_ALT =
  *  The baked-in text is acceptable for launch; see the handoff note about asking the designer
  *  for text-free artwork later so the heading can be real markup. */
 export function PersonalisedBanner() {
+  const image = BANNERS.personalised || '/assets/personalised-banner.jpg';
+  const mobile = BANNERS.personalisedMobile || '/assets/personalised-gift-box-v2.jpg';
+  const alt = BANNERS.personalisedAlt || FALLBACK_ALT;
+  const cta = BANNERS.personalisedCta || 'Personalise Your Gift';
   const { w } = useViewport();
   const href = whatsappUrl();
 
@@ -19,9 +24,9 @@ export function PersonalisedBanner() {
     <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
       {w >= 760 ? (
         <div className={s.imageWrap}>
-          <img src="/assets/personalised-banner.jpg" alt={BANNER_ALT} loading="lazy" className={s.image} />
+          <img src={image} alt={alt} loading="lazy" className={s.image} />
           <a href={href} target="_blank" rel="noopener" className={s.liveCta}>
-            Personalise Your Gift{' '}
+            {cta}{' '}
             <span aria-hidden="true" className={s.arrow}>
               →
             </span>
@@ -44,7 +49,7 @@ export function PersonalisedBanner() {
             </div>
             <span className={s.script}>Personalised with Love</span>
             <a href={href} target="_blank" rel="noopener" className={s.darkCta}>
-              Personalise Your Gift{' '}
+              {cta}{' '}
               <span aria-hidden="true" style={{ fontSize: 16 }}>
                 →
               </span>
@@ -52,7 +57,7 @@ export function PersonalisedBanner() {
           </div>
           <div className={s.photo}>
             <img
-              src="/assets/personalised-gift-box-v2.jpg"
+              src={mobile}
               alt="Cream jewellery box engraved with Aarunya, holding gold necklaces and rings"
               loading="lazy"
               className={s.photoImg}

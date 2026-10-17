@@ -50,19 +50,29 @@ src/
 
 ## Data layer
 
-`src/data/api.ts` is the only thing that talks to the network. It ships with
-`CONFIG.USE_MOCK = true` and the mock catalogue from the handoff.
+`src/data/api.ts` is the only thing that talks to the network, and it now runs against the
+real API by default. `npm run dev` proxies `/api` and `/uploads` to `http://localhost:4000`,
+so the store, the API and the product photos all share an origin in development.
 
-To point it at the Spring Boot backend:
+Start the backend first — see `../aarunya-backend/README.md`.
 
-```bash
-# .env.local
-VITE_USE_MOCK=false
-VITE_API_BASE=http://localhost:8080/api
-```
+The store's own content is not hard-coded. `src/data/storefront.ts` fetches
+`GET /api/storefront` before the first render and fills `CONFIG`, `ANNOUNCEMENTS`, `COLORS`,
+`CATEGORIES`, `OFFERS`, `PAIRINGS` and `BANNERS` in place, so whatever the admin panel saves
+is what the shop shows — settings, categories, colours, hero and banner artwork, offer cards
+and the announcement bar. If the API is unreachable the app still renders, with the defaults
+in `config.ts`, and logs the failure.
 
-Endpoints: `GET /products`, `GET /products/{slug}`, `GET /categories`, `POST /cart`,
-`POST /orders`, `GET /delivery/estimate?pin=`, `POST /payments/create`.
+| Variable | Default | Used for |
+|---|---|---|
+| `VITE_API_BASE` | `/api` | API base path; absolute URL to skip the dev proxy |
+| `VITE_API_PROXY` | `http://localhost:4000` | Where `npm run dev` proxies `/api` and `/uploads` |
+| `VITE_USE_MOCK` | unset | Set to `true` to run on the built-in mock catalogue again |
+
+Endpoints: `GET /storefront`, `GET /products`, `GET /products/{slug}`, `GET /categories`,
+`POST /cart`, `POST /orders`, `GET /delivery/estimate?pin=`, `POST /payments/create`.
+Cart totals and the order total are recomputed server-side; the client's figures are
+never trusted.
 
 ## State
 

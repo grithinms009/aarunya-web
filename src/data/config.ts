@@ -14,8 +14,9 @@ import type {
 } from './types';
 
 export const CONFIG = {
-  API_BASE: import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/api',
-  USE_MOCK: import.meta.env.VITE_USE_MOCK !== 'false',
+  API_BASE: import.meta.env.VITE_API_BASE ?? '/api',
+  /* The built-in mock catalogue is opt-in now that the API serves the store. */
+  USE_MOCK: import.meta.env.VITE_USE_MOCK === 'true',
   WHATSAPP_NUMBER: '919876543210', // country code + number, digits only — REPLACE
   WHATSAPP_TEXT:
     'Hi Aarunya Jewels by Veena, I would like to know more about your jewellery.',
@@ -30,7 +31,19 @@ export const CONFIG = {
   DELIVERY_DAYS: { local: [2, 3], rest: [4, 7] } as Record<string, [number, number]>,
 };
 
-/** Scrolling announcement bar at the top of every page. Add / remove offers here. */
+/** Home-page artwork and copy. Empty until loadStorefront() fills it from the API, where
+ *  the admin panel's Banners & homepage screen writes it. */
+export const BANNERS = {
+  heroDesktop: '',
+  heroMobile: '',
+  heroAlt: '',
+  personalised: '',
+  personalisedMobile: '',
+  personalisedAlt: '',
+  personalisedCta: '',
+};
+
+/** Scrolling announcement bar. Filled from the API by loadStorefront(). */
 export const ANNOUNCEMENTS = [
   'Pan India Shipping',
   'Free Shipping on Orders Above ₹499',
