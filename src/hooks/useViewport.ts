@@ -46,7 +46,7 @@ function compute(w: number): Viewport {
     gridCats: cols(w < 600 ? 2 : w < 1024 ? 3 : 4),
     whyCols: cols(w < 900 ? 2 : 4),
     igCols: cols(isMobile ? 3 : 6),
-    footCols: isDesktop ? '1.6fr 1fr 1fr' : '1fr 1fr',
+    footCols: isDesktop ? '1.5fr 1fr 1fr 1fr' : '1fr 1fr',
     footBrand: isDesktop ? 'auto' : '1 / -1',
     two: w >= 860 ? 'minmax(0,1fr) minmax(0,1fr)' : '1fr',
     cartCols: w >= 900 ? 'minmax(0,1.5fr) minmax(300px,1fr)' : '1fr',

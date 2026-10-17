@@ -15,8 +15,8 @@ const NAV_A: { label: string; href: string; keys: RouteName[] }[] = [
 ];
 const NAV_B: { label: string; href: string; keys: RouteName[] }[] = [
   { label: 'Collections', href: '/collections', keys: ['collections'] },
-  { label: 'About Us', href: '/about', keys: ['about'] },
-  { label: 'Contact', href: '/contact', keys: ['contact'] },
+  { label: 'About Us', href: '/about-us', keys: ['about'] },
+  { label: 'Contact', href: '/contact-us', keys: ['contact'] },
 ];
 
 /** Left drawer: nav links, a "Jewellery" accordion with nested category accordions,

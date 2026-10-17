@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Seo } from '@/components/ui/Seo';
 import { LockIcon } from '@/components/ui/icons';
 import { api } from '@/data/api';
+import { rememberLastOrder } from '@/lib/lastOrder';
 import { STATES } from '@/data/config';
 import { useCart } from '@/hooks/useCart';
 import { useViewport } from '@/hooks/useViewport';
@@ -43,6 +44,12 @@ const BLANK: OrderCustomer = {
   state: 'Kerala', pin: '',
 };
 
+const policyLink: React.CSSProperties = {
+  color: '#2E2826',
+  textDecoration: 'underline',
+  textUnderlineOffset: 2,
+};
+
 export function Checkout() {
   const cart = useCart();
   const { L } = useViewport();
@@ -52,7 +59,7 @@ export function Checkout() {
   const [form, setForm] = useState<OrderCustomer>(BLANK);
   const [errs, setErrs] = useState<OrderErrors>({});
   const [placing, setPlacing] = useState(false);
-  const [order, setOrder] = useState<{ orderId: string; payStatus: string } | null>(null);
+  const [order, setOrder] = useState<{ orderId: string; payStatus: string; token?: string } | null>(null);
 
   const set = (k: keyof OrderCustomer, value: string) => {
     setForm((f) => ({ ...f, [k]: value }));
@@ -83,7 +90,11 @@ export function Checkout() {
       // In production, open the Razorpay/Cashfree checkout here with this payload and
       // handle its success and failure callbacks.
       const pay = await api.createPayment({ orderId: created.orderId, amount: cart.raw.total });
-      setOrder({ orderId: created.orderId, payStatus: pay.status });
+      /* Remember it so Track Order fills itself in on this device. */
+      if (created.accessToken) {
+        rememberLastOrder({ orderId: created.orderId, token: created.accessToken });
+      }
+      setOrder({ orderId: created.orderId, payStatus: pay.status, token: created.accessToken });
       setPlacing(false);
       window.scrollTo(0, 0);
     } catch {
@@ -179,6 +190,25 @@ export function Checkout() {
             gateway is connected.
           </p>
           <code className={cls.payCode}>POST /payments/create → {order.payStatus}</code>
+
+          {order.token && (
+            <div style={{ marginTop: 4, padding: '14px 16px', background: '#FBF7F4', border: '1px solid #EFE6DF', borderRadius: 10, maxWidth: '34em', textAlign: 'left' }}>
+              <strong style={{ display: 'block', fontSize: 14, color: '#2E2826', marginBottom: 4 }}>
+                Your tracking code
+              </strong>
+              <code style={{ display: 'block', wordBreak: 'break-all', fontSize: 13, color: '#2E2826' }}>
+                {order.token}
+              </code>
+              <p style={{ margin: '8px 0 0', fontSize: 13, color: '#756964', lineHeight: 1.6 }}>
+                Keep this with your order number — together they let you follow your parcel.
+                We have saved them in this browser, so{' '}
+                <Link to={`/track-order?order=${encodeURIComponent(order.orderId)}&token=${encodeURIComponent(order.token)}`} style={{ color: '#2E2826' }}>
+                  Track Order
+                </Link>{' '}
+                will already know them here.
+              </p>
+            </div>
+          )}
           <Link
             to="/shop"
             style={{ marginTop: 6, minHeight: 50, display: 'inline-flex', alignItems: 'center', padding: '0 28px', borderRadius: 999, border: '1px solid #C79A45', color: '#302722', textDecoration: 'none', fontSize: 14 }}
@@ -219,6 +249,18 @@ export function Checkout() {
                 Please check the highlighted fields.
               </p>
             )}
+
+            <p style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.7, color: '#756964' }}>
+              By placing this order you agree to our{' '}
+              <Link to="/terms-and-conditions" style={policyLink}>Terms and Conditions</Link>,{' '}
+              <Link to="/privacy-policy" style={policyLink}>Privacy Policy</Link>,{' '}
+              <Link to="/shipping-policy" style={policyLink}>Shipping Policy</Link> and{' '}
+              <Link to="/refund-and-cancellation-policy" style={policyLink}>
+                Refund and Cancellation Policy
+              </Link>
+              . Payments are processed securely by Razorpay; we never see or store your card
+              or UPI details.
+            </p>
 
             <button type="submit" disabled={placing} className={cls.submit} style={{ opacity: placing ? 0.6 : 1 }}>
               {placing ? 'Placing order…' : `Place Order · ${cart.total}`}

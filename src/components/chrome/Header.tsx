@@ -16,8 +16,8 @@ const NAV: { label: string; href: string; keys: RouteName[] }[] = [
   { label: 'Home', href: '/', keys: ['home'] },
   { label: 'Shop', href: '/shop', keys: ['shop', 'category', 'product'] },
   { label: 'Collections', href: '/collections', keys: ['collections'] },
-  { label: 'About Us', href: '/about', keys: ['about'] },
-  { label: 'Contact', href: '/contact', keys: ['contact'] },
+  { label: 'About Us', href: '/about-us', keys: ['about'] },
+  { label: 'Contact', href: '/contact-us', keys: ['contact'] },
 ];
 
 /** How long the mega menu waits before closing after the pointer leaves. */

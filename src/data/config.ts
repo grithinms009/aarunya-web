@@ -29,6 +29,12 @@ export const CONFIG = {
   DISPATCH_CUTOFF_HOUR: 16, // orders before 4 pm dispatch the same working day
   HOME_STATE_PIN_PREFIXES: ['67', '68', '69'], // Kerala — faster delivery
   DELIVERY_DAYS: { local: [2, 3], rest: [4, 7] } as Record<string, [number, number]>,
+  /* Return policy, filled from the API: the admin edits these under Returns. */
+  returnWindow: 0,
+  requireVideo: true,
+  allowRefund: true,
+  /** Category slugs that can only be exchanged when the piece is damaged. */
+  nonEligible: [] as string[],
 };
 
 /** Home-page artwork and copy. Empty until loadStorefront() fills it from the API, where

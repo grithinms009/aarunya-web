@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { prefersReducedMotion } from '@/hooks/useReducedMotion';
 import { useViewport } from '@/hooks/useViewport';
-import { FEATURE_ICONS, HeartIcon } from '@/components/ui/icons';
+import { HeartIcon } from '@/components/ui/icons';
 import s from './Gallery.module.css';
 
 export interface GalleryView {
@@ -14,7 +14,8 @@ export interface GalleryView {
 }
 
 /** Main image with prev/next arrows and a thumbnail row beneath, then the three
- *  Anti-Tarnish / Skin Safe / Gift Ready highlights. Image changes crossfade with a
+ *  highlights, which are derived from the piece itself rather than asserted for every
+ *  product. Image changes crossfade with a
  *  1.035 scale. */
 export function Gallery({
   views,
@@ -26,6 +27,8 @@ export function Gallery({
   wishLabel,
   /** Changes whenever the colour variant changes, so the crossfade also runs then. */
   variantKey,
+  /** Only the highlights this piece actually supports are shown. */
+  highlights,
 }: {
   views: GalleryView[];
   index: number;
@@ -35,6 +38,7 @@ export function Gallery({
   onWish: () => void;
   wishLabel: string;
   variantKey: string;
+  highlights: { label: string; d: string }[];
 }) {
   const { w } = useViewport();
   const frameRef = useRef<HTMLDivElement>(null);
@@ -135,8 +139,9 @@ export function Gallery({
         )}
       </div>
 
+      {highlights.length > 0 && (
       <ul aria-label="Highlights" className={s.features}>
-        {FEATURE_ICONS.map((ft, i) => (
+        {highlights.map((ft, i) => (
           <li key={ft.label} className={s.feature} style={{ borderLeft: i ? '1px solid #DCC7A6' : 'none' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"
               style={{ flex: 'none', fill: 'none', stroke: '#8A6527', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
@@ -146,6 +151,7 @@ export function Gallery({
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

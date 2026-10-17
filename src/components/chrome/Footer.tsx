@@ -2,20 +2,30 @@ import { Link } from 'react-router-dom';
 import { instagramUrl, whatsappUrl } from '@/lib/format';
 import { useViewport } from '@/hooks/useViewport';
 import { LockIcon } from '@/components/ui/icons';
+import { SUPPORT, addressLine } from '@/config/businessInfo';
 import s from './Footer.module.css';
 
 const SHOP_LINKS = [
-  { label: 'Shop', href: '/shop' },
+  { label: 'All Jewellery', href: '/shop' },
+  { label: 'New Arrivals', href: '/shop?sort=new' },
   { label: 'Collections', href: '/collections' },
-  { label: 'About Us', href: '/about' },
-  { label: 'Contact Us', href: '/contact' },
+  { label: 'Offers', href: '/shop?sale=1' },
 ];
 
-const HELP_LINKS = [
+const CARE_LINKS = [
+  { label: 'Contact Us', href: '/contact-us' },
+  { label: 'FAQs', href: '/faq' },
+  { label: 'Track Order', href: '/track-order' },
   { label: 'Shipping Policy', href: '/shipping-policy' },
-  { label: 'Return & Exchange Policy', href: '/return-policy' },
+  { label: 'Returns & Replacements', href: '/returns-and-replacements' },
+  { label: 'Refund & Cancellation', href: '/refund-and-cancellation-policy' },
+];
+
+const INFO_LINKS = [
+  { label: 'About Us', href: '/about-us' },
+  { label: 'Terms & Conditions', href: '/terms-and-conditions' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
-  { label: 'Terms & Conditions', href: '/terms' },
+  { label: 'Grievance Redressal', href: '/grievance-redressal' },
 ];
 
 const PAY_MARKS = ['UPI', 'RuPay', 'Visa', 'Mastercard', 'Net Banking'];
@@ -55,13 +65,34 @@ export function Footer() {
           ))}
         </nav>
 
-        <nav aria-label="Help" className={s.col}>
-          <span className={s.colTitle}>Help</span>
-          {HELP_LINKS.map((l) => (
+        <nav aria-label="Customer care" className={s.col}>
+          <span className={s.colTitle}>Customer Care</span>
+          {CARE_LINKS.map((l) => (
             <Link key={l.href} to={l.href} className={s.colLink}>
               {l.label}
             </Link>
           ))}
+        </nav>
+
+        <nav aria-label="Information" className={s.col}>
+          <span className={s.colTitle}>Information</span>
+          {INFO_LINKS.map((l) => (
+            <Link key={l.href} to={l.href} className={s.colLink}>
+              {l.label}
+            </Link>
+          ))}
+          <span className={s.colTitle} style={{ marginTop: 14 }}>Reach us</span>
+          {SUPPORT.email && (
+            <a href={`mailto:${SUPPORT.email}`} className={s.colLink}>{SUPPORT.email}</a>
+          )}
+          {SUPPORT.phone && (
+            <a href={`tel:${SUPPORT.phone}`} className={s.colLink}>{SUPPORT.phone}</a>
+          )}
+          {addressLine() && (
+            <span className={s.colLink} style={{ cursor: 'default', lineHeight: 1.6 }}>
+              {addressLine()}
+            </span>
+          )}
         </nav>
       </div>
 

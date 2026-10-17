@@ -17,8 +17,16 @@ async function http<T>(path: string, init: { method?: string; body?: unknown } =
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) throw new Error(`${method} ${path} failed: ${res.status}`);
-  return res.json() as Promise<T>;
+
+  const text = await res.text();
+  const data = text ? (JSON.parse(text) as unknown) : null;
+
+  if (!res.ok) {
+    /* The API explains itself in { error, message }; show that rather than a status code. */
+    const msg = (data as { message?: string } | null)?.message;
+    throw new Error(msg ?? `${method} ${path} failed: ${res.status}`);
+  }
+  return data as T;
 }
 
 /** Mock responses deep-clone and resolve on a short delay, as the prototype did. */
@@ -29,6 +37,35 @@ const qs = (o: Record<string, string>) => {
   const s = new URLSearchParams(o).toString();
   return s ? `?${s}` : '';
 };
+
+/** What GET /orders/{no}/track returns to the shopper holding the access token. */
+export interface OrderTracking {
+  orderId: string;
+  status: string;
+  payment: string;
+  placedAt: string;
+  total: number;
+  name: string;
+  city: string;
+  items: { name: string; color: string; qty: number; price: number }[];
+  shipment: {
+    courier: string;
+    awb: string;
+    shippedAt: string | null;
+    trackingUrl: string | null;
+  } | null;
+  returnRequest: { id: string; status: string } | null;
+  history: { status: string; note: string; at: string }[];
+}
+
+export interface ContactMessage {
+  name: string;
+  email: string;
+  phone: string;
+  orderNo: string;
+  subject: string;
+  message: string;
+}
 
 export const api = {
   /** GET /products */
@@ -69,6 +106,27 @@ export const api = {
     const [min, max] = CONFIG.DELIVERY_DAYS[local ? 'local' : 'rest'];
     return mock<DeliveryEstimate>({ ok: true, pin, minDays: min, maxDays: max, cod: false });
   },
+
+  /** GET /orders/{orderNo}/track?token= — needs the token issued at checkout. */
+  trackOrder: (orderNo: string, token: string): Promise<OrderTracking> =>
+    http<OrderTracking>(
+      `/orders/${encodeURIComponent(orderNo)}/track?token=${encodeURIComponent(token)}`,
+    ),
+
+  /** POST /orders/{orderNo}/replacement-request?token= */
+  requestReplacement: (
+    orderNo: string,
+    token: string,
+    body: { reason: string; note?: string; variantId?: string },
+  ): Promise<{ id: string; status: string; message: string }> =>
+    http(
+      `/orders/${encodeURIComponent(orderNo)}/replacement-request?token=${encodeURIComponent(token)}`,
+      { method: 'POST', body },
+    ),
+
+  /** POST /contact — the contact form. Resolves only when the API stored the message. */
+  sendMessage: (body: ContactMessage): Promise<{ ok: boolean; id: number }> =>
+    http('/contact', { method: 'POST', body }),
 
   /** POST /payments/create — backend creates a Razorpay/Cashfree order and returns what the
    *  checkout SDK needs. No gateway is simulated here. */

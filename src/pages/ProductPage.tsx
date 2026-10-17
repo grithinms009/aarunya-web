@@ -7,9 +7,10 @@ import { HeartIcon } from '@/components/ui/icons';
 import { Gallery, type GalleryView } from '@/components/pdp/Gallery';
 import { GiftWrap } from '@/components/pdp/GiftWrap';
 import { DeliveryCheck } from '@/components/pdp/DeliveryCheck';
+import { FEATURE_ICONS } from '@/components/ui/icons';
 import { PairItUp } from '@/components/pdp/PairItUp';
 import { ProductRow } from '@/components/home/ProductRow';
-import { CONTENT, VIEWS } from '@/data/config';
+import { CONFIG, CONTENT, VIEWS } from '@/data/config';
 import { useCatalog } from '@/hooks/useCatalog';
 import { useViewport } from '@/hooks/useViewport';
 import { prefersReducedMotion } from '@/hooks/useReducedMotion';
@@ -19,6 +20,12 @@ import { useShop, useUi } from '@/store/useStore';
 import cls from './ProductPage.module.css';
 
 type TabKey = 'details' | 'material' | 'care' | 'shipping' | 'returns';
+
+const pdpPolicyLink: React.CSSProperties = {
+  color: '#2E2826',
+  textDecoration: 'underline',
+  textUnderlineOffset: 2,
+};
 
 export function ProductPage() {
   const { slug = '' } = useParams();
@@ -146,7 +153,13 @@ export function ProductPage() {
     { key: 'care', tab: 'Care', title: 'Care Instructions', lines: CONTENT.care },
     {
       key: 'shipping', tab: 'Shipping', title: 'Shipping & Delivery',
-      lines: ['₹60 shipping on orders below ₹499.', 'FREE shipping on orders ₹499 and above.', 'Pan India Delivery.', ...CONTENT.delivery],
+      /* Read live, so the product page can never quote a fee the checkout disagrees with. */
+      lines: [
+        `${fmt(CONFIG.SHIPPING_FEE)} shipping on orders below ${fmt(CONFIG.FREE_SHIPPING_THRESHOLD)}.`,
+        `FREE shipping on orders ${fmt(CONFIG.FREE_SHIPPING_THRESHOLD)} and above.`,
+        'Delivered across India by India Post.',
+        ...CONTENT.delivery,
+      ],
     },
     { key: 'returns', tab: 'Returns', title: 'Returns / Exchange', lines: CONTENT.returns },
   ];
@@ -196,6 +209,16 @@ export function ProductPage() {
   const gridCols = w >= 860 ? 'minmax(0,500px) minmax(0,400px)' : 'minmax(0,520px)';
   const tabCols = w >= 860 ? 'minmax(0,1.15fr) minmax(0,1fr)' : '1fr';
 
+
+  /* Only claim what this piece actually supports. A blanket "anti-tarnish · skin safe ·
+     gift ready" strip on every product would assert things the catalogue cannot back. */
+  const text = `${product.material} ${product.description}`;
+  const highlights = [
+    /anti.?tarnish/i.test(text) ? FEATURE_ICONS[0] : null,
+    /nickel.?free|hypoallergen|skin.?safe/i.test(text) ? FEATURE_ICONS[1] : null,
+    product.giftWrap ? FEATURE_ICONS[2] : null,
+  ].filter((x): x is (typeof FEATURE_ICONS)[number] => Boolean(x));
+
   return (
     <>
       <Seo title={product.name} description={product.description} product={product} />
@@ -215,6 +238,7 @@ export function ProductPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: gridCols, justifyContent: 'center', gap: 'clamp(28px,5.5vw,72px)', alignItems: 'start' }}>
           <Gallery
+            highlights={[...highlights]}
             views={views}
             index={img}
             onIndex={setImg}
@@ -332,6 +356,17 @@ export function ProductPage() {
             </div>
 
             <DeliveryCheck />
+
+            <p style={{ margin: '14px 0 0', fontSize: 12.5, lineHeight: 1.7, color: '#756964' }}>
+              <Link to="/shipping-policy" style={pdpPolicyLink}>Shipping &amp; delivery</Link>
+              {' · '}
+              <Link to="/returns-and-replacements" style={pdpPolicyLink}>Returns &amp; replacements</Link>
+              {' · '}
+              <Link to="/refund-and-cancellation-policy" style={pdpPolicyLink}>Refunds</Link>
+            </p>
+            <p style={{ margin: '8px 0 0', fontSize: 12, lineHeight: 1.7, color: '#8C807A' }}>
+              Fashion jewellery. Not solid gold, solid silver or hallmarked precious metal.
+            </p>
           </div>
         </div>
       </section>

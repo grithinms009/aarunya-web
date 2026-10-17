@@ -48,7 +48,7 @@ export function OurStory() {
             carries a little of <strong style={{ fontWeight: 500, color: '#302722' }}>South India’s love for gold</strong>,
             made anti-tarnish so it keeps its shine.
           </p>
-          <Link to="/about" className={pill.goldGradient}>
+          <Link to="/about-us" className={pill.goldGradient}>
             Discover our story →
           </Link>
         </div>

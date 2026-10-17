@@ -2,13 +2,35 @@ export type RouteName =
   | 'home' | 'shop' | 'category' | 'product' | 'cart' | 'checkout' | 'wishlist'
   | 'about' | 'contact' | 'collections' | 'policy' | 'notfound';
 
-export const POLICY_SLUGS = ['shipping-policy', 'return-policy', 'privacy-policy', 'terms'];
+/* About and Contact keep their own names so the header can highlight them; everything
+   else informational shares 'policy'. */
+
+/** Information and policy routes. Used for nav highlighting and page titles. */
+export const POLICY_SLUGS = [
+  'about-us',
+  'contact-us',
+  'terms-and-conditions',
+  'privacy-policy',
+  'shipping-policy',
+  'refund-and-cancellation-policy',
+  'returns-and-replacements',
+  'faq',
+  'track-order',
+  'grievance-redressal',
+  /* The paths this site used before, which now redirect. */
+  'about',
+  'contact',
+  'return-policy',
+  'terms',
+];
 
 /** Route name for the current path — drives nav highlighting and page titles.
  *  Mirrors the prototype's `parse()` map. */
 export function routeNameOf(pathname: string): RouteName {
   const [first = ''] = pathname.replace(/^\/+/, '').split('/');
   if (first === '') return 'home';
+  if (first === 'about' || first === 'about-us') return 'about';
+  if (first === 'contact' || first === 'contact-us') return 'contact';
   if (POLICY_SLUGS.includes(first)) return 'policy';
   const map: Record<string, RouteName> = {
     shop: 'shop',
@@ -17,8 +39,6 @@ export function routeNameOf(pathname: string): RouteName {
     cart: 'cart',
     checkout: 'checkout',
     wishlist: 'wishlist',
-    about: 'about',
-    contact: 'contact',
     collections: 'collections',
   };
   return map[first] ?? 'notfound';

@@ -36,6 +36,10 @@ export interface Product {
   reviewCount: number;
   description: string;
   material: string;
+  /** Whether gift wrap can be added to this piece. */
+  giftWrap?: boolean;
+  /** Whether this piece is eligible for exchange, per the shop's policy. */
+  exchange?: boolean;
   variants: Variant[];
 }
 
@@ -126,6 +130,8 @@ export interface OrderResult {
   orderId: string;
   status: string;
   amount: number;
+  /** The shopper's private handle on this order, issued once at checkout. */
+  accessToken?: string;
 }
 
 export interface PaymentResult {

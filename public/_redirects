@@ -1,0 +1,4 @@
+# Cloudflare Pages serves static files first, then falls through to here.
+# This app routes in the browser, so every unmatched path must return index.html
+# with a 200 — otherwise a direct hit on /shipping-policy or a refresh 404s.
+/*  /index.html  200
