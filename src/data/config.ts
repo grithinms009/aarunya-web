@@ -47,6 +47,13 @@ export const BANNERS = {
   personalisedMobile: '',
   personalisedAlt: '',
   personalisedCta: '',
+  /* The gifting campaign. Empty here and filled by GET /api/storefront once the admin
+     grows fields for it; until then LuxuryGiftingReveal falls back to the shipped
+     artwork, so adding them later needs no change on this side. */
+  giftingDesktop: '',
+  giftingMobile: '',
+  giftingAlt: '',
+  giftingCtaHref: '',
 };
 
 /** Scrolling announcement bar. Filled from the API by loadStorefront(). */

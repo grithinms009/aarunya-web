@@ -2,7 +2,7 @@ import { Seo } from '@/components/ui/Seo';
 import { Hero } from '@/components/home/Hero';
 import { TrustStrip } from '@/components/home/TrustStrip';
 import { ShopByCategory } from '@/components/home/ShopByCategory';
-import { PersonalisedBanner } from '@/components/home/PersonalisedBanner';
+import { LuxuryGiftingReveal } from '@/components/home/LuxuryGiftingReveal';
 import { SaleOffers } from '@/components/home/SaleOffers';
 import { WhyAarunya } from '@/components/home/WhyAarunya';
 import { OurStory } from '@/components/home/OurStory';
@@ -41,7 +41,7 @@ export function Home() {
         <ProductRow items={best} viewAllHref="/shop" heading={<SectionTitle>Best Sellers</SectionTitle>} />
       </section>
 
-      <PersonalisedBanner />
+      <LuxuryGiftingReveal />
 
       <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
         <ProductRow

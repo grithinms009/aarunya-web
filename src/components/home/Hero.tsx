@@ -1,77 +1,84 @@
 import { Link } from 'react-router-dom';
 import { useViewport } from '@/hooks/useViewport';
-import { HeroOrnament } from '@/components/ui/SectionTitle';
 import { BANNERS } from '@/data/config';
 import s from './Hero.module.css';
 
-/* Used only until the admin uploads its own artwork. */
-const FALLBACK_SRC = '/assets/aarunya-hero-pastel.jpg';
-const FALLBACK_ALT =
-  'Hi, I am Aarunya. A little heart with a big love for beautiful things. Illustration of a little girl in a magenta silk pavada with gold bangles, beside a jewellery box of jasmine.';
+/* The shipped artwork, in two cuts.
+ *
+ * Wide: 2:1, the girl right of centre, a floral spray at each edge, and a clear blush
+ * field between the left spray and her, which is where the wording sits. Phone: 1:1, the
+ * girl centred and framed by the florals. Neither has any wording painted into it. */
+const ARTWORK = '/assets/hero-desktop.jpg';
+const ARTWORK_MOBILE = '/assets/hero-mobile.jpg';
+const ARTWORK_ALT =
+  'Aarunya, a little girl in a magenta silk pavada with gold bangles, among jasmine '
+  + 'and blossom.';
 
-/** At >=900px the artwork shows at natural size with the CTAs overlaid on it and a visually
- *  hidden H1. Below that the image is full-width and heading, intro and buttons stack under it. */
+/**
+ * The hero.
+ *
+ * The artwork is always shown whole. Its frame keeps the picture's own shape (2:1 wide,
+ * 1:1 on a phone) and only changes size, so nothing is cropped away and she is never
+ * blown up past the first screen. Its edges fade into the paper colour around it.
+ *
+ * The heading, sentence and buttons are real HTML. On a wide screen they sit in the
+ * picture's clear field, placed and sized in proportion to the picture, so they stay in
+ * that field at every width. On a phone they sit below the picture.
+ */
 export function Hero() {
   const { w } = useViewport();
-  const overlay = w >= 900;
-  /* The phone image is optional; the desktop one stands in when it is not set. */
-  const src = (!overlay && BANNERS.heroMobile) || BANNERS.heroDesktop || FALLBACK_SRC;
-  const alt = BANNERS.heroAlt || FALLBACK_ALT;
+  /* Below the desktop width the clear field is too narrow for the words. */
+  const stacked = w < 1024;
 
-  const imgStyle: React.CSSProperties = overlay
-    ? {
-        display: 'block', width: 'auto', height: 'auto', maxWidth: '100%',
-        maxHeight: 'max(460px, calc(100vh - 150px))',
-      }
-    : { width: '100%', height: 'auto', display: 'block' };
+  /* Anything the shop uploads through Banners & homepage replaces the artwork. Uploads
+     should keep the same shapes and the same clear field on the left of the wide cut. */
+  const custom = (stacked && BANNERS.heroMobile) || BANNERS.heroDesktop || '';
+  const src = custom || (stacked ? ARTWORK_MOBILE : ARTWORK);
+  const alt = BANNERS.heroAlt || ARTWORK_ALT;
+
+  const copy = (
+    <div className={s.copy}>
+      <p className={s.eyebrow}>Handpicked in Kerala</p>
+
+      <h1 className={s.heading}>
+        Little treasures, <em>chosen with love.</em>
+      </h1>
+
+      <p className={s.sub}>
+        Anti-tarnish jewellery that keeps its shine — for festivals, gifting and every day.
+      </p>
+
+      <div className={s.actions}>
+        <Link to="/shop" className={s.primary}>
+          Shop now
+        </Link>
+        <Link to="/collections" className={s.quiet}>
+          Explore collections
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" className={s.arrow}>
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Link>
+      </div>
+    </div>
+  );
 
   return (
-    <section aria-label="Welcome" className={s.section}>
-      <div className={s.frame}>
-        <div className={s.inner}>
-          <img src={src} alt={alt} style={imgStyle} />
-          <div aria-hidden="true" className={s.fadeLeft} />
-          <div aria-hidden="true" className={s.fadeRight} />
-          <div aria-hidden="true" className={s.fadeBottom} />
-
-          {overlay && (
-            <>
-              <h1 className="sr-only">
-                Aarunya Jewels by Veena: little treasures, chosen with love.
-              </h1>
-              <div className={s.overlayCtas}>
-                <Link to="/shop" className={`${s.pill} ${s.primary}`}>
-                  Shop Now
-                </Link>
-                <Link to="/collections" className={`${s.pill} ${s.outline}`}>
-                  Explore Collections
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
+    <section aria-label="Welcome" className={stacked ? `${s.section} ${s.stacked}` : s.section}>
+      <div className={s.art}>
+        <img src={src} alt={alt} className={s.image} />
+        <div aria-hidden="true" className={s.fade} />
+        {/* Wide: the words over the clear field of the picture */}
+        {!stacked && copy}
       </div>
-
-      {!overlay && (
-        <div className={s.below}>
-          <HeroOrnament />
-          <h1 style={{ margin: 0, fontFamily: "'Cormorant Garamond',serif", fontWeight: 500, fontSize: 'clamp(32px,7vw,46px)', lineHeight: 1.05, textWrap: 'balance', maxWidth: '12em' }}>
-            Little treasures, chosen with love.
-          </h1>
-          <p style={{ margin: 0, maxWidth: '30em', fontSize: 15, lineHeight: 1.7, color: '#756964', fontWeight: 300 }}>
-            Aarunya Jewels by Veena brings you beautiful anti-tarnish jewellery made for everyday
-            moments, little celebrations and everything in between.
-          </p>
-          <div className={s.belowCtas}>
-            <Link to="/shop" className={`${s.pill} ${s.primary} ${s.belowPill} ${s.belowPrimary}`}>
-              Shop Now
-            </Link>
-            <Link to="/collections" className={`${s.pill} ${s.outline} ${s.belowPill} ${s.belowOutline}`}>
-              Explore Collections
-            </Link>
-          </div>
-        </div>
-      )}
+      {/* Phone: the words below the picture */}
+      {stacked && copy}
     </section>
   );
 }

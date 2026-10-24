@@ -1,0 +1,152 @@
+/* LuxuryGiftingReveal — an editorial unveil for the gifting campaign.
+ *
+ * The artwork itself never moves, scales or crops: it is laid out at its intrinsic ratio
+ * with height:auto, so what you see is the file as supplied at every width. All of the
+ * motion belongs to the frame around it, which GSAP widens from a matted 80% to the full
+ * column as you scroll.
+ *
+ * The frame's width is the animated property, so the section reserves its own height from
+ * the image's aspect ratio — the page never reflows as the reveal plays.
+ */
+
+.section {
+  background: var(--bg);
+}
+
+.inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) var(--side-pad);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Starts matted and settles full width. The starting width is set by GSAP per breakpoint
+   so there is no flash of the wrong size before the trigger attaches. */
+.frame {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  /* Reserved from the artwork's native 1983 × 793, so nothing shifts while it loads. */
+  aspect-ratio: 1983 / 793;
+  background: #fbeee6;
+  box-shadow: 0 30px 70px -40px rgba(120, 86, 60, 0.32);
+  will-change: width, transform;
+}
+
+/* The picture, exactly as supplied: full frame, native ratio, no cropping. */
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* `contain` rather than `cover`: the whole artwork stays visible even if the reserved
+     box and the file ever disagree by a rounding pixel. */
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------------- the printed button */
+
+/* A real link over the button drawn into the artwork. Proportional, so it tracks the
+   frame through the expansion. Invisible, but focusable and hoverable. */
+.hotspot {
+  position: absolute;
+  border-radius: 999px;
+  text-indent: -9999px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.hotspot:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px -12px rgba(109, 29, 48, 0.7);
+}
+
+.hotspot:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------- mobile CTA */
+
+/* Below 768px the printed button is a few millimetres tall, so a real one sits under the
+   artwork. Above that the hotspot is the link and this is removed from the page entirely
+   rather than merely hidden, so there is no duplicate in the tab order. */
+.mobileCta {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding: clamp(32px, 8vw, 48px) var(--side-pad) clamp(36px, 9vw, 52px);
+  }
+
+  .frame {
+    border-radius: 12px;
+  }
+
+  /* The printed button is not a reliable target at this size; the one below is. */
+  .hotspot {
+    display: none;
+  }
+
+  .mobileCta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    min-height: 52px;
+    margin-top: clamp(18px, 5vw, 26px);
+    padding: 0 28px;
+    border-radius: 999px;
+    background: var(--wine);
+    color: var(--bg);
+    font-family: var(--font-body);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: background 0.25s var(--ease);
+  }
+
+  .mobileCta:hover {
+    background: var(--wine-hover);
+    color: var(--bg);
+  }
+
+  .arrow {
+    transition: transform 0.25s var(--ease);
+  }
+
+  .mobileCta:hover .arrow {
+    transform: translateX(4px);
+  }
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+/* useGSAP bails before building any timeline, so the frame simply renders at its final
+   size. These rules clear the hover travel that remains. */
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    width: 100% !important;
+    opacity: 1 !important;
+    transform: none !important;
+    border-radius: 10px !important;
+  }
+
+  .hotspot,
+  .mobileCta,
+  .arrow {
+    transition: none;
+  }
+
+  .hotspot:hover,
+  .mobileCta:hover .arrow {
+    transform: none;
+    box-shadow: none;
+  }
+}
