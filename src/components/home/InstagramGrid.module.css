@@ -1,26 +1,83 @@
+/* The section is full width so the carousel can reach both edges of the window. Only the
+   heading is pulled back to the page's reading width. */
+.section {
+  padding-top: clamp(56px, 8vw, 100px);
+}
+
+.head {
+  max-width: 1280px;
+  margin: 0 auto clamp(20px, 3vw, 32px);
+  padding: 0 clamp(16px, 4vw, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1.15;
+}
+
+.handle {
+  color: var(--wine);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+}
+
+/* The carousel fills this box, so the box is what decides how tall the strip is. Tall
+   enough that the portrait cards read as photographs rather than thumbnails, short enough
+   to leave the sections either side of it room to breathe. */
+.stage {
+  height: clamp(340px, 40vw, 520px);
+}
+
+/* The carousel clips with `overflow: hidden`, which makes it a scroll container, and it
+   ships with `overscroll-behavior: contain` — right for a carousel you have opened on its
+   own, wrong for a band sitting inside a page, because the container then swallows a
+   vertical wheel instead of letting it chain to the document and the page stops scrolling
+   under the pointer. It takes no vertical scroll of its own, so chaining is restored. */
+.stage :global(.flex-carousel) {
+  overscroll-behavior: auto;
+}
+
+/* ---------------------------------------------------------------- fallback */
+
+/* Without WebGL the six posts are laid out as the square tiles this section used before. */
+.grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px);
+  display: grid;
+  gap: clamp(6px, 1vw, 14px);
+}
+
 .tile {
   display: block;
   aspect-ratio: 1/1;
   border-radius: 14px;
   overflow: hidden;
 }
+
 .image {
   width: 100%;
   height: 100%;
   transition: transform 0.7s;
 }
+
 .tile:hover .image {
   transform: scale(1.05);
 }
-.handle {
-  color: var(--wine);
-  text-decoration: none;
-  border-bottom: 1px solid var(--gold);
-}
+
 @media (prefers-reduced-motion: reduce) {
   .image {
     transition: none;
   }
+
   .tile:hover .image {
     transform: none;
   }
