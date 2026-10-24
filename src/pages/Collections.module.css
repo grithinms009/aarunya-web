@@ -28,7 +28,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--ink-muted);
-  background: rgba(255, 249, 246, 0.88);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   padding: 3px 8px;
   border-radius: 6px;
   white-space: nowrap;

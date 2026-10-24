@@ -140,7 +140,7 @@ export function MobileMenu() {
               target="_blank"
               rel="noopener"
               className={s.menuCta}
-              style={{ background: '#8D3545', color: '#FFF9F6' }}
+              style={{ background: '#8D3545', color: 'var(--bg)' }}
             >
               Chat on WhatsApp
             </a>
@@ -148,7 +148,7 @@ export function MobileMenu() {
             <Link
               to="/contact-us"
               className={s.menuCta}
-              style={{ background: '#8D3545', color: '#FFF9F6' }}
+              style={{ background: '#8D3545', color: 'var(--bg)' }}
             >
               Contact us
             </Link>

@@ -61,7 +61,7 @@ export function Newsletter() {
                 type="submit"
                 style={{
                   flex: '1 0 auto', height: 52, padding: '0 28px', borderRadius: 999, border: 'none',
-                  background: '#8D3545', color: '#FFF9F6', fontSize: 14, letterSpacing: '.06em',
+                  background: '#8D3545', color: 'var(--bg)', fontSize: 14, letterSpacing: '.06em',
                   cursor: 'pointer', transition: 'background .25s',
                 }}
               >

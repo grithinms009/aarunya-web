@@ -172,7 +172,7 @@
   right: 0;
   bottom: 0;
   z-index: 45;
-  background: rgba(255, 249, 246, 0.96);
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);

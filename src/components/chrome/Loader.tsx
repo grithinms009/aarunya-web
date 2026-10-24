@@ -135,7 +135,7 @@ export function Loader({ ready, onDone }: { ready: boolean; onDone: () => void }
       role="status"
       aria-label="Loading Aarunya by Veena"
       style={{
-        position: 'fixed', inset: 0, zIndex: 200, background: '#FFF9F6',
+        position: 'fixed', inset: 0, zIndex: 200, background: 'var(--bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', willChange: 'transform',
       }}
     >

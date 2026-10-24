@@ -129,7 +129,7 @@ export function ProductCard({ product, preferredColors, ratio = '4 / 5' }: Produ
                   background: sw.hex,
                   boxShadow:
                     i === index
-                      ? '0 0 0 2px #FFF9F6, 0 0 0 3px #9D762F'
+                      ? '0 0 0 2px var(--bg), 0 0 0 3px #9D762F'
                       : 'inset 0 0 0 1px rgba(48,39,34,.18)',
                 }}
               />

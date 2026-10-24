@@ -2,7 +2,9 @@
    Values are the source of truth for every colour, size and spacing decision. */
 :root {
   /* Colours */
-  --bg: #fff9f6;
+  /* The page field: a plain off-white. Everything that shows bare page uses this, and so
+     does light text sitting on wine or ink, so the two always belong to each other. */
+  --bg: #faf8f5;
   --bg-hero: #fcf0ee;
   --blush: #fbefef;
   --blush-2: #fbe8e4;

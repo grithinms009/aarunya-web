@@ -147,7 +147,7 @@ export function Shop() {
             className={s.chip}
             style={{
               background: c.active ? '#302722' : '#FFFFFF',
-              color: c.active ? '#FFF9F6' : '#302722',
+              color: c.active ? 'var(--bg)' : '#302722',
               border: `1px solid ${c.active ? '#302722' : '#EADAD4'}`,
             }}
           >

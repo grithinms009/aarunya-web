@@ -13,7 +13,7 @@ const ITEMS = [
 export function TrustStrip() {
   const { L } = useViewport();
   return (
-    <section aria-label="Why shop with us" style={{ borderBottom: '1px solid #F0E2DE', background: '#FFF9F6' }}>
+    <section aria-label="Why shop with us" style={{ borderBottom: '1px solid #F0E2DE', background: 'var(--bg)' }}>
       <div
         style={{
           maxWidth: 1280, margin: '0 auto',

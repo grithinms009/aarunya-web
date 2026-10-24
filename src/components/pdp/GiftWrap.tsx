@@ -71,7 +71,7 @@ export function GiftWrap() {
           gap: 6, minHeight: 36, padding: '0 14px',
           border: `1px ${gift ? 'solid' : 'dashed'} ${gift ? '#8D3545' : '#D9A3AD'}`,
           background: gift ? '#8D3545' : 'rgba(255,255,255,.7)',
-          color: gift ? '#FFF9F6' : '#8D3545',
+          color: gift ? 'var(--bg)' : '#8D3545',
           fontFamily: 'inherit', fontSize: 12.5, fontWeight: 500, cursor: 'pointer',
           whiteSpace: 'nowrap', transition: 'background .25s, color .25s',
         }}

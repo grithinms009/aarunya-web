@@ -31,7 +31,7 @@ export function Wishlist() {
           </p>
           <Link
             to="/shop"
-            style={{ marginTop: 8, minHeight: 50, display: 'inline-flex', alignItems: 'center', padding: '0 28px', borderRadius: 999, background: '#8D3545', color: '#FFF9F6', textDecoration: 'none', fontSize: 14 }}
+            style={{ marginTop: 8, minHeight: 50, display: 'inline-flex', alignItems: 'center', padding: '0 28px', borderRadius: 999, background: '#8D3545', color: 'var(--bg)', textDecoration: 'none', fontSize: 14 }}
           >
             Shop Now
           </Link>

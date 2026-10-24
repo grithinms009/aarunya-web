@@ -16,7 +16,7 @@ export function Toast({ raised }: { raised: boolean }) {
         transition: 'opacity .3s, transform .3s',
         zIndex: 95,
         background: '#302722',
-        color: '#FFF9F6',
+        color: 'var(--bg)',
         fontSize: 13,
         padding: '12px 20px',
         borderRadius: 999,

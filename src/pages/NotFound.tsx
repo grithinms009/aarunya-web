@@ -10,7 +10,7 @@ export function NotFound() {
       </h1>
       <Link
         to="/"
-        style={{ minHeight: 48, display: 'inline-flex', alignItems: 'center', padding: '0 26px', borderRadius: 999, background: '#8D3545', color: '#FFF9F6', textDecoration: 'none', fontSize: 14 }}
+        style={{ minHeight: 48, display: 'inline-flex', alignItems: 'center', padding: '0 26px', borderRadius: 999, background: '#8D3545', color: 'var(--bg)', textDecoration: 'none', fontSize: 14 }}
       >
         Back home
       </Link>

@@ -80,7 +80,7 @@ export function Layout() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#FFF9F6',
+        background: 'var(--bg)',
         fontFamily: "'Jost',sans-serif",
         fontWeight: 400,
         color: '#302722',
