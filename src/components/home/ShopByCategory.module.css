@@ -1,16 +1,78 @@
+/* One line of category tiles. The title keeps the page's reading width; the row runs the
+   full width of the window, so when it drifts the tiles arrive and leave at the edges of
+   the screen rather than stopping dead at an invisible boundary. */
+
+.section {
+  /* One tile, and the space between two. Everything below is measured from these. */
+  --tile: clamp(96px, 10.5vw, 150px);
+  --gap: clamp(16px, 2.2vw, 30px);
+  padding-top: clamp(40px, 6vw, 72px);
+}
+
+.head {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px);
+}
+
+.viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Only the sideways scroll is held in, so a sideways flick never turns into a browser
+     "back" — the page's own up-and-down scrolling is left alone. */
+  overscroll-behavior-x: contain;
+  /* Our own writes set the position every frame; smooth scrolling would fight them. */
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  /* Room for a focus ring, and for the labels to sit clear of the next section. */
+  padding: 6px 0 4px;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* Only while the row drifts: the tiles melt into the paper at both edges instead of being
+   cut off by a hard line. */
+.masked {
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+}
+
+.track {
+  display: flex;
+  gap: var(--gap);
+  width: max-content;
+}
+
+/* While the tiles fit there is nothing to scroll, so the row is simply centred and still.
+   `width: auto` lets it fill the viewport, which is what `justify-content` centres in. */
+.centred {
+  width: auto;
+  justify-content: center;
+  padding: 0 clamp(16px, 4vw, 40px);
+}
+
+.group {
+  display: flex;
+  gap: var(--gap);
+}
+
 .tile {
+  flex: none;
+  width: var(--tile);
   text-decoration: none;
   color: var(--ink);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  min-width: 0;
   padding: 4px 0;
 }
+
 .tile:hover {
   color: var(--wine);
 }
+
 /* 1:1 circle with a 5px padding ring; the border turns gold on hover. */
 .ring {
   width: 100%;
@@ -21,36 +83,43 @@
   background: var(--bg);
   transition: border-color 0.3s;
 }
+
 .tile:hover .ring {
   border-color: var(--gold);
 }
+
 .clip {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
 }
+
 .image {
   width: 100%;
   height: 100%;
   transition: transform 0.8s var(--ease-soft);
 }
+
 .tile:hover .image {
   transform: scale(1.06);
 }
+
 .label {
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.3vw, 16px);
+  font-size: clamp(13px, 1.1vw, 16px);
   font-weight: 500;
   line-height: 1.2;
   text-align: center;
   letter-spacing: 0.02em;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .ring,
   .image {
     transition: none;
   }
+
   .tile:hover .image {
     transform: none;
   }
