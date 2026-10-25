@@ -28,9 +28,9 @@ export function Home() {
   const { products } = useCatalog();
   const { homeN, L } = useViewport();
 
-  // One full row — five across on a laptop — except at three-up, where two rows of three
-  // read better than one short one. Trimmed afterwards so a row is never left ragged.
-  const homeCount = homeN === 3 ? 6 : homeN;
+  // One full row on a laptop. Narrow screens take two rows instead: a phone showing two
+  // cards is barely a selection, and a second row costs only a scroll.
+  const homeCount = homeN <= 3 ? homeN * 2 : homeN;
   const best = fitRows(products.filter((p) => p.featured).slice(0, homeCount), homeN);
   const fresh = fitRows(
     products
