@@ -12,23 +12,28 @@ import s from './InstagramGrid.module.css';
    for a strip that sits below the story. */
 const FlexCarousel = lazy(() => import('@/components/vendor/FlexCarousel/FlexCarousel'));
 
-/** Six posts. Placeholder photos — swap for real posts (or an Instagram feed) later. */
-const POST_IDS = [
-  '1688382654723-a7366006519b',
-  '1722410180687-b05b50922362',
-  '1721206625226-c064ff8d92a7',
-  '1633810542706-90e5ff7557be',
-  '1652374968229-a66a1c170c04',
-  '1701450723521-788008974862',
-];
+/* The posts, in the order they run. Each alt line says what is actually pictured, since
+   this is the only description a screen reader gets for the whole strip. */
+const POSTS = [
+  ['ig-01', 'An Aarunya gift box, ribboned, holding a stone-set necklace and matching jhumkas'],
+  ['ig-02', 'A tray of gold-tone nose pins and hoops, some stone-set, some plain'],
+  ['ig-03', 'Three stone-set bangles resting on ivory silk'],
+  ['ig-04', 'A stone-set bracelet and ring worn with an embroidered ivory saree'],
+  ['ig-05', 'Pearl-drop chandelier earrings beside a peacock feather'],
+  ['ig-06', 'A choker and matching drop earrings worn with a rose-pink saree'],
+  ['ig-07', 'A chunky link chain and matching bracelet worn with ivory'],
+  ['ig-08', 'A long stone necklace with bangles and jhumkas, laid on pink silk'],
+  ['ig-09', 'An emerald and pearl necklace set shown on a display bust'],
+  ['ig-10', 'A pearl and stone necklace with drop earrings, worn with an ivory saree'],
+] as const;
 
 const TINTS = ['#F7E4E4', '#F5ECDD', '#F3E1D7'];
 
 /* Module-level, so the carousel is never handed a new array and never re-reads its
    textures on a parent re-render. */
-const ITEMS: FlexCarouselItem[] = POST_IDS.map((id) => ({
-  src: `/assets/demo/${id}.jpg`,
-  alt: 'Aarunya Instagram post',
+const ITEMS: FlexCarouselItem[] = POSTS.map(([file, alt]) => ({
+  src: `/assets/instagram/${file}.jpg`,
+  alt,
 }));
 
 /**
@@ -52,9 +57,9 @@ function PostGrid({ href }: { href: string }) {
 
   return (
     <div className={s.grid} style={{ gridTemplateColumns: L.igCols }}>
-      {POST_IDS.map((id, i) => (
+      {POSTS.map(([file, alt], i) => (
         <a
-          key={id}
+          key={file}
           href={href}
           target="_blank"
           rel="noopener"
@@ -64,9 +69,9 @@ function PostGrid({ href }: { href: string }) {
         >
           <div
             role="img"
-            aria-label="Aarunya Instagram post"
+            aria-label={alt}
             className={s.image}
-            style={{ background: `center/cover no-repeat url("/assets/demo/${id}.jpg")` }}
+            style={{ background: `center/cover no-repeat url("/assets/instagram/${file}.jpg")` }}
           />
         </a>
       ))}
