@@ -13,19 +13,31 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useCatalog } from '@/hooks/useCatalog';
 import { useViewport } from '@/hooks/useViewport';
 
+/* The two product rows share the one page width, so every section on the page lines up
+   on the same left and right edge. */
+const ROW_SECTION = {
+  maxWidth: 'var(--max-w)',
+  margin: '0 auto',
+  /* Twice the side margin the rest of the page uses. The product cards are the densest
+     thing on the page, so they need more air at the edges than a heading or a band of
+     text does; everything else keeps the page's normal gutter. */
+  padding: 'clamp(48px,7vw,88px) clamp(32px,6vw,120px) 0',
+} as const;
+
 export function Home() {
   const { products } = useCatalog();
-  const { n } = useViewport();
+  const { homeN, L } = useViewport();
 
-  // Four cards normally, six when the grid is three-up, then trimmed to fill whole rows.
-  const homeCount = n === 3 ? 6 : 4;
-  const best = fitRows(products.filter((p) => p.featured).slice(0, homeCount), n);
+  // One full row — five across on a laptop — except at three-up, where two rows of three
+  // read better than one short one. Trimmed afterwards so a row is never left ragged.
+  const homeCount = homeN === 3 ? 6 : homeN;
+  const best = fitRows(products.filter((p) => p.featured).slice(0, homeCount), homeN);
   const fresh = fitRows(
     products
       .filter((p) => p.isNew)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .slice(0, homeCount),
-    n,
+    homeN,
   );
 
   return (
@@ -37,15 +49,21 @@ export function Home() {
       <TrustStrip />
       <ShopByCategory />
 
-      <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
-        <ProductRow items={best} viewAllHref="/shop" heading={<SectionTitle>Best Sellers</SectionTitle>} />
+      <section data-fade style={ROW_SECTION}>
+        <ProductRow
+          items={best}
+          cols={L.homeRowCols}
+          viewAllHref="/shop"
+          heading={<SectionTitle>Best Sellers</SectionTitle>}
+        />
       </section>
 
       <LuxuryGiftingReveal />
 
-      <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
+      <section data-fade style={ROW_SECTION}>
         <ProductRow
           items={fresh}
+          cols={L.homeRowCols}
           viewAllHref="/shop?sort=newest"
           heading={<SectionTitle>New Arrivals</SectionTitle>}
         />

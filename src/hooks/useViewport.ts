@@ -8,13 +8,20 @@ export interface Viewport {
   isDesktop: boolean;
   isMobile: boolean;
   notDesktop: boolean;
-  /** Product columns: 2 under 600, 3 under 1024, else 4. */
+  /** Product columns, stepping up with the page: 2 under 600, 3 under 1024, 4 under
+   *  1180, 5 under 1800, 6 above. Four across a 2000px window made each card about
+   *  460px wide — far larger than the piece of jewellery in it needs. */
   n: number;
+  /** Columns for the home page's Best Sellers and New Arrivals rows: five across on a
+   *  laptop, otherwise the same as `n`. Separate from `n` so the product grids and the
+   *  "You May Also Love" row on a product page are left alone. */
+  homeN: number;
   L: Layout;
 }
 
 export interface Layout {
   prodCols: string;
+  homeRowCols: string;
   otCols: string;
   trustCols: string;
   trustJustify: string;
@@ -35,9 +42,13 @@ export interface Layout {
 function compute(w: number): Viewport {
   const isDesktop = w >= 1024;
   const isMobile = w < 768;
-  const n = w < 600 ? 2 : w < 1024 ? 3 : 4;
+  const n = w < 600 ? 2 : w < 1024 ? 3 : w < 1180 ? 4 : w < 1800 ? 5 : 6;
+  /* The home rows hold at five even where the shop grid goes to six: they are a curated
+     row, not a catalogue, and five reads as a deliberate selection. */
+  const homeN = w >= 1180 ? 5 : n;
   const L: Layout = {
     prodCols: cols(n),
+    homeRowCols: cols(homeN),
     otCols: w >= 860 ? cols(4) : cols(2),
     trustCols: isDesktop ? cols(4) : cols(2),
     trustJustify: isDesktop ? 'center' : 'flex-start',
@@ -54,7 +65,7 @@ function compute(w: number): Viewport {
     sumOrder: w >= 900 ? 0 : -1,
     fCols: w >= 600 ? '1fr 1fr' : '1fr',
   };
-  return { w, isDesktop, isMobile, notDesktop: !isDesktop, n, L };
+  return { w, isDesktop, isMobile, notDesktop: !isDesktop, n, homeN, L };
 }
 
 export function useViewport(): Viewport {

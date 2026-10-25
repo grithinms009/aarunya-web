@@ -56,7 +56,7 @@ export function SaleOffers() {
   const divider = '1px solid rgba(141,53,69,.12)';
 
   return (
-    <section data-fade aria-label="Sale and offers" style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(56px,8vw,100px) clamp(16px,4vw,40px) 0' }}>
+    <section data-fade aria-label="Sale and offers" style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(56px,8vw,100px) clamp(16px,4vw,40px) 0' }}>
       <EyebrowTitle
         eyebrow="Limited time · While stocks last"
         size="clamp(32px,4.4vw,50px)"

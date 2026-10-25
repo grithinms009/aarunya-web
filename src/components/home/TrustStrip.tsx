@@ -16,7 +16,7 @@ export function TrustStrip() {
     <section aria-label="Why shop with us" style={{ borderBottom: '1px solid #F0E2DE', background: 'var(--bg)' }}>
       <div
         style={{
-          maxWidth: 1280, margin: '0 auto',
+          maxWidth: 'var(--max-w)', margin: '0 auto',
           padding: 'clamp(18px,3vw,26px) clamp(16px,4vw,40px)',
           display: 'grid', gridTemplateColumns: L.trustCols, gap: '16px 12px',
         }}

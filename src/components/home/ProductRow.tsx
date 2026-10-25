@@ -15,17 +15,21 @@ export function ProductRow({
   items,
   viewAllHref,
   heading,
+  cols,
 }: {
   items: Product[];
   viewAllHref?: string;
   /** Rendered above the grid; Best Sellers / New Arrivals pass an ornamented SectionTitle. */
   heading?: React.ReactNode;
+  /** Overrides the grid template. The home page's two rows pass a wider one so they can
+   *  show five across on a laptop; everywhere else keeps the usual product columns. */
+  cols?: string;
 }) {
   const { L } = useViewport();
   return (
     <>
       {heading}
-      <div style={{ display: 'grid', gridTemplateColumns: L.rowCols, gap: 'clamp(12px,2vw,24px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: cols ?? L.rowCols, gap: 'clamp(12px,2vw,24px)' }}>
         {items.map((p) => (
           <div key={p.id} style={{ minWidth: 0 }}>
             <ProductCard product={p} />

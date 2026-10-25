@@ -19,7 +19,7 @@ export function Newsletter() {
   };
 
   return (
-    <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(56px,8vw,100px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
+    <section data-fade style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(56px,8vw,100px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
       <div
         style={{
           background: '#FBEFEF', borderRadius: 24,

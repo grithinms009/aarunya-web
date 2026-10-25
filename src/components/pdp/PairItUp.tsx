@@ -58,7 +58,7 @@ export function PairItUp({
   };
 
   return (
-    <section data-fade aria-label="Complete the look" style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
+    <section data-fade aria-label="Complete the look" style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
       <div className={s.wrap}>
         <EyebrowTitle eyebrow="Styled together" size="clamp(28px,3.6vw,40px)" marginBottom="clamp(20px,3vw,32px)">
           Pair it up to <em style={{ color: '#8D3545' }}>complete the look</em>

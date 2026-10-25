@@ -3,8 +3,18 @@ import { useViewport } from '@/hooks/useViewport';
 import { Eyebrow } from '@/components/ui/SectionTitle';
 import pill from '@/components/ui/Pill.module.css';
 
-const IMG_1 = '/assets/demo/1601121141418-c1caa10a2a0b.jpg';
-const IMG_2 = '/assets/demo/1701450723521-788008974862.jpg';
+const IMG_1 = '/assets/story-necklace.jpg';
+const IMG_2 = '/assets/story-jhumkas.jpg';
+
+/* Narrower than the page width on purpose. Stretched to the full width the two columns
+   grow past 900px each: the pictures balloon, and the paragraph column — which stops at a
+   readable 520px — leaves a wide empty band on the right. Holding the section at 1180
+   keeps the pictures at their intended size and the text beside them rather than adrift. */
+const STORY_SECTION = {
+  maxWidth: 1180,
+  margin: '0 auto',
+  padding: 'clamp(64px,9vw,120px) clamp(16px,4vw,40px) 0',
+} as const;
 
 /** Two offset 3:4 images with asymmetric radii, beside the brand story and a gold pill CTA. */
 export function OurStory() {
@@ -12,20 +22,20 @@ export function OurStory() {
   const cols = w >= 900 ? 'minmax(0,1fr) minmax(0,1fr)' : '1fr';
 
   return (
-    <section data-fade aria-label="Our story" style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(64px,9vw,120px) clamp(16px,4vw,40px) 0' }}>
+    <section data-fade aria-label="Our story" style={STORY_SECTION}>
       <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 'clamp(32px,6vw,88px)', alignItems: 'center' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'clamp(10px,1.4vw,16px)', alignItems: 'start' }}>
           <div style={{ aspectRatio: '3/4', borderRadius: '20px 20px 20px 80px', overflow: 'hidden', background: '#F5E8CD', border: '1px solid #F0E2DE' }}>
             <div
               role="img"
-              aria-label="Gold necklace set laid on fabric"
+              aria-label="A gold temple necklace with ruby-red stones and pearl drops, resting on pale stone"
               style={{ width: '100%', height: '100%', background: `center/cover no-repeat url("${IMG_1}")` }}
             />
           </div>
           <div style={{ marginTop: 'clamp(36px,6vw,72px)', aspectRatio: '3/4', borderRadius: '80px 20px 20px 20px', overflow: 'hidden', background: '#F7E4E4', border: '1px solid #F0E2DE' }}>
             <div
               role="img"
-              aria-label="Jhumka earrings styled with a saree"
+              aria-label="A pair of gold jhumka earrings with pearl fringes, beside ivory silk"
               style={{ width: '100%', height: '100%', background: `center/cover no-repeat url("${IMG_2}")` }}
             />
           </div>

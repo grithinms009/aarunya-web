@@ -21,8 +21,13 @@
    words are measured against (cqw), so they grow and shrink with the picture. */
 .art {
   position: relative;
-  width: min(100%, 1680px, calc(var(--hero-h) * 2));
-  aspect-ratio: 2 / 1;
+  /* Full width: the banner runs the whole window, no cap. Height is fixed rather than
+     taken from the 2:1 aspect, because at this width 2:1 would be a thousand pixels tall;
+     the picture fills it with object-fit: cover instead, trimming top and bottom on a very
+     wide screen. Horizontal proportions are untouched, so the wording still lands in the
+     clear field of the artwork. */
+  width: 100%;
+  height: var(--hero-h);
   margin: 0 auto;
   container-type: inline-size;
 }
@@ -195,6 +200,9 @@
 
 .stacked .art {
   width: min(100%, 520px);
+  /* Back to auto so the square cut's aspect-ratio decides the height; the wide rule above
+     sets an explicit height, which would otherwise win and stretch the square. */
+  height: auto;
   aspect-ratio: 1 / 1;
 }
 

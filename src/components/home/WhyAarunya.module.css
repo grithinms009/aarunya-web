@@ -1,0 +1,162 @@
+/* The four reasons to buy here, as cards.
+ *
+ * Everything is centred on a vertical axis: badge, title, rule, sentence. The ornament is
+ * carried by a tinted circle at the top of each card rather than a mark in the corner, so
+ * the four read as a set of medallions. */
+
+.section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(56px, 8vw, 100px) clamp(16px, 4vw, 40px) 0;
+}
+
+/* ---------------------------------------------------------------- heading */
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+/* The eyebrow sits between two long hairlines, so it reads as a label on a line rather
+   than a stray line of small caps. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.eyebrow::before,
+.eyebrow::after {
+  content: '';
+  width: clamp(40px, 7vw, 92px);
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-light), transparent);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.08;
+  text-align: center;
+  color: var(--ink);
+}
+
+/* Rule, quatrefoil, rule: the brand's full stop under a section heading. */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--gold);
+}
+
+.ornament::before,
+.ornament::after {
+  content: '';
+  width: clamp(36px, 5vw, 60px);
+  height: 1px;
+  background: var(--gold-light);
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.grid {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 26px);
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: clamp(26px, 2.8vw, 38px) clamp(18px, 2vw, 28px) clamp(30px, 3vw, 40px);
+  background: linear-gradient(170deg, var(--white) 0%, #fdf7f3 100%);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 1px 2px rgba(48, 39, 34, 0.03);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold-light);
+  box-shadow: 0 16px 34px -24px rgba(141, 53, 69, 0.3);
+}
+
+/* The tinted medallion the icon sits in. */
+.badge {
+  display: grid;
+  place-items: center;
+  width: clamp(56px, 4.4vw, 70px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--blush);
+  color: var(--gold-deep);
+  transition: background 0.4s var(--ease);
+}
+
+.card:hover .badge {
+  background: var(--blush-2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(19px, 1.6vw, 23px);
+  line-height: 1.18;
+  color: var(--ink);
+}
+
+/* A short rule between the title and the sentence, as on the section heading. */
+.cardRule {
+  width: 30px;
+  height: 1px;
+  background: var(--gold-light);
+}
+
+.cardText {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+/* Line-art in the lower corner, set faint enough to be felt rather than read. */
+.flourish {
+  position: absolute;
+  right: -6px;
+  bottom: -8px;
+  width: clamp(76px, 7vw, 104px);
+  color: var(--gold);
+  opacity: 0.17;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .badge {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

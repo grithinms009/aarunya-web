@@ -13,7 +13,7 @@ export function Collections() {
   const { L } = useViewport();
 
   return (
-    <section style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(28px,5vw,56px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
+    <section style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(28px,5vw,56px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
       <Seo title="Collections" />
       <Breadcrumb crumbs={[{ label: 'Home', href: '/' }, { label: 'Collections' }]} marginBottom={14} />
       <h1 style={{ margin: '0 0 8px', fontFamily: "'Cormorant Garamond',serif", fontWeight: 500, fontSize: 'clamp(34px,5vw,54px)', lineHeight: 1.05 }}>

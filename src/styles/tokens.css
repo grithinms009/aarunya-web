@@ -33,7 +33,10 @@
   --font-mono: ui-monospace, Menlo, monospace;
 
   /* Layout */
-  --max-w: 1280px;
+  /* The page width every section lines up to. Wide enough that on a normal screen the
+     only margin is each section's own side padding, while an ultrawide monitor still
+     stops the content short of absurd. The hero ignores this and runs full width. */
+  --max-w: 1920px;
   --side-pad: clamp(16px, 4vw, 40px);
 
   /* Motion */

@@ -23,7 +23,7 @@ export function PersonalisedBanner() {
   const href = SUPPORT.whatsapp ? whatsappUrl() : '/contact-us';
 
   return (
-    <section data-fade style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
+    <section data-fade style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(48px,7vw,88px) clamp(16px,4vw,40px) 0' }}>
       {w >= 760 ? (
         <div className={s.imageWrap}>
           <img src={image} alt={alt} loading="lazy" className={s.image} />

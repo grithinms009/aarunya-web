@@ -15,7 +15,7 @@ export function Wishlist() {
   const saved = wish.map((id) => products.find((p) => p.id === id)).filter((p) => !!p);
 
   return (
-    <section style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(24px,4vw,48px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
+    <section style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(24px,4vw,48px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
       <Seo title="Wishlist" />
       <h1 style={{ margin: '0 0 clamp(18px,3vw,30px)', fontFamily: "'Cormorant Garamond',serif", fontWeight: 500, fontSize: 'clamp(34px,5vw,52px)', lineHeight: 1.05 }}>
         Wishlist

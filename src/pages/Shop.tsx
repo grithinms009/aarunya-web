@@ -107,7 +107,7 @@ export function Shop() {
   const countText = pieces(items.length);
 
   return (
-    <section style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(22px,4vw,44px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
+    <section style={{ maxWidth: 'var(--max-w)', margin: '0 auto', padding: 'clamp(22px,4vw,44px) clamp(16px,4vw,40px) clamp(56px,8vw,96px)' }}>
       <Seo title={oneType ? oneType.name : oneCat ? oneCat.name : 'Shop All Jewellery'} />
 
       <nav aria-label="Breadcrumb" style={{ fontSize: 13, color: '#756964', display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
