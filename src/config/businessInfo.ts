@@ -86,7 +86,7 @@ export const ADDRESS: PostalAddress = {
  * as primary has not been confirmed. Until it is, no canonical tag is emitted — better
  * than naming the wrong one and splitting the site across two canonical hosts.
  */
-export const PRIMARY_DOMAIN: Supplied<string> = null;
+export const PRIMARY_DOMAIN: Supplied<string> = 'aarunyajewelsbyveena.in';
 
 /* ------------------------------------------------------------------ support */
 
