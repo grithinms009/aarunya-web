@@ -6,3 +6,6 @@ dist
 .env.local
 *.local
 test-screenshots/
+
+# Wrangler's local state and asset cache
+.wrangler/

@@ -1,0 +1,23 @@
+{
+  // Deploy config for Cloudflare Workers Static Assets.
+  //
+  // Without this file `wrangler deploy` tries to auto-detect the framework, finds Vite 5
+  // and refuses, because its automatic Vite integration needs Vite 6+. This site does not
+  // need that integration: `npm run build` already produces a finished static bundle, and
+  // all Wrangler has to do is upload it. An explicit config skips the detection entirely,
+  // so the Vite version stops mattering.
+  "name": "aarunya-web",
+  "compatibility_date": "2026-10-25",
+  "assets": {
+    "directory": "./dist",
+    // The app routes in the browser, so an unmatched path must return index.html with a
+    // 200 rather than a 404 — otherwise a refresh on /shop or a direct hit on a policy
+    // page breaks.
+    //
+    // This is the ONLY place that rule belongs. public/_redirects used to carry
+    // `/*  /index.html  200`, which is a Pages convention: Workers Static Assets rejects
+    // it outright as an infinite loop, because the rule would strip `/index` and match
+    // itself again. The file is gone; do not reinstate it.
+    "not_found_handling": "single-page-application"
+  }
+}
