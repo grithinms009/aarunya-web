@@ -12,6 +12,7 @@ import {
   ANNOUNCEMENTS, BANNERS, CATEGORIES, COLORS, CONFIG, OFFERS, PAIRINGS,
 } from './config';
 import type { Category, ColorDef, ColorKey, Offer } from './types';
+import { withMediaOrigin } from './media';
 
 interface Banners {
   heroDesktop: string;
@@ -52,7 +53,7 @@ export function loadStorefront(): Promise<void> {
   loaded = (async () => {
     const res = await fetch(CONFIG.API_BASE + '/storefront');
     if (!res.ok) throw new Error(`GET /storefront failed: ${res.status}`);
-    const data = (await res.json()) as StorefrontPayload;
+    const data = withMediaOrigin((await res.json()) as StorefrontPayload);
 
     /* API_BASE and USE_MOCK are local settings and must survive the merge. */
     const { API_BASE, USE_MOCK } = CONFIG;

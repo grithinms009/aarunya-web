@@ -9,6 +9,7 @@ import type {
   PaymentResult,
   Product,
 } from './types';
+import { withMediaOrigin } from './media';
 
 async function http<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
   const { method = 'GET', body } = init;
@@ -19,7 +20,9 @@ async function http<T>(path: string, init: { method?: string; body?: unknown } =
   });
 
   const text = await res.text();
-  const data = text ? (JSON.parse(text) as unknown) : null;
+  /* Upload paths arrive relative and are made absolute here, once, so no component has
+     to remember to do it. See ./media.ts. */
+  const data = text ? withMediaOrigin(JSON.parse(text) as unknown) : null;
 
   if (!res.ok) {
     /* The API explains itself in { error, message }; show that rather than a status code. */
