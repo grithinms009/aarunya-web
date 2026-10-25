@@ -46,8 +46,8 @@ export function Terms() {
           {ADDRESS.state}, {ADDRESS.country}.
         </P>
         <P>
-          Our correspondence and return address is{' '}
-          <Detail value={addressLine()} what="full operating address" />. You can reach us at{' '}
+          We operate from <Detail value={addressLine()} what="operating address" />.
+          You can reach us at{' '}
           <Detail value={SUPPORT.email} what="support email" /> or{' '}
           <Detail value={SUPPORT.phone} what="support phone" />.
         </P>

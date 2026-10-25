@@ -11,7 +11,12 @@
  */
 import { List, P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
 import { CATEGORIES, CONFIG } from '@/data/config';
-import { RETURNS, SHIPPING, SUPPORT, addressLine } from '@/config/businessInfo';
+import {
+  RETURNS,
+  RETURN_ADDRESS_POLICY,
+  SHIPPING,
+  SUPPORT,
+} from '@/config/businessInfo';
 
 export function Returns() {
   const days = RETURNS.windowDays;
@@ -141,8 +146,7 @@ export function Returns() {
           <Detail value={RETURNS.returnShipping} what="who pays return postage, and when" />
         </P>
         <P>
-          Our return address is <Detail value={addressLine()} what="full return address" />.
-          Please do not send anything to any other address.
+          {RETURN_ADDRESS_POLICY} Please do not send anything to any other address.
         </P>
       </Section>
 

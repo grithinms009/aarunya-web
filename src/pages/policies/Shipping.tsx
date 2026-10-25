@@ -7,7 +7,11 @@
  */
 import { List, P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
 import { fmt } from '@/lib/format';
-import { SHIPPING, SUPPORT, addressLine } from '@/config/businessInfo';
+import {
+  RETURN_ADDRESS_POLICY,
+  SHIPPING,
+  SUPPORT,
+} from '@/config/businessInfo';
 
 export function Shipping() {
   const fee = fmt(SHIPPING.feeBelowThreshold);
@@ -132,7 +136,7 @@ export function Shipping() {
           for how refunds are handled.
         </P>
         <P>
-          Our return address is <Detail value={addressLine()} what="full return address" />.
+          {RETURN_ADDRESS_POLICY}
         </P>
       </Section>
 

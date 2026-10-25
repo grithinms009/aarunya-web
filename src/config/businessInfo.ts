@@ -69,15 +69,38 @@ export const MERCHANT = {
   gstin: null as Supplied<string>,
 };
 
-/** The real operating address, also used as the return address. */
+/**
+ * The address shown publicly.
+ *
+ * Deliberately the locality rather than the doorstep: the shop is run from a home, and
+ * a house name and post office published on every policy page is more than a customer
+ * needs in order to know where the business operates. It still identifies the business
+ * to a place, a district and a PIN, which is what a payment provider and a customer are
+ * looking for.
+ *
+ * It is NOT postally complete, so it must not be printed as the address to post a return
+ * to. Returns are confirmed with support first — see RETURN_ADDRESS_POLICY below — and
+ * the full address is given then.
+ */
 export const ADDRESS: PostalAddress = {
-  line1: 'Pulickatharayil, Edappon',
-  line2: 'Ayranikudy P.O.',
-  city: 'Mavelikara, Alappuzha District',
+  line1: 'Edappon',
+  line2: '',
+  city: 'Mavelikara, Alappuzha',
   state: 'Kerala',
   pin: '690558',
   country: 'India',
 };
+
+/**
+ * What the policy pages say instead of printing an address to post to.
+ *
+ * Every return is approved before anything is sent back, so the complete address is
+ * given at that point. Printing an incomplete one would lose parcels; printing the
+ * complete one puts a home address on a public page.
+ */
+export const RETURN_ADDRESS_POLICY =
+  'We confirm every return before anything is posted, and give you the full return '
+  + 'address when we approve it. Please do not post anything back before then.';
 
 /**
  * The primary production domain. Only one, so canonical URLs stay unambiguous.
