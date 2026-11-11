@@ -96,12 +96,30 @@ export interface DeliveryEstimate {
   minDays?: number;
   maxDays?: number;
   cod?: boolean;
+  /** State name, null when the PIN spans two states. */
+  state?: string | null;
+  district?: string;
+  zone?: 'home' | 'rest' | 'remote' | null;
+  shippingFee?: number;
+  /** Set when ok is false. */
+  reason?: 'unknown_pin' | 'no_delivery';
 }
 
 export interface CartLine {
   pid: string;
   vid: string;
   qty: number;
+}
+
+/** Optional billing details, sent only when they differ from the delivery address. */
+export interface BillingDetails {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  pin: string;
+  /** Optional, for business purchases. The server validates it. */
+  gstin: string;
 }
 
 export interface OrderCustomer {
@@ -114,29 +132,81 @@ export interface OrderCustomer {
   city: string;
   state: string;
   pin: string;
+  billing?: BillingDetails;
 }
 
+/** What the browser sends. Prices and totals are deliberately absent: the server prices
+ *  the order from the catalogue and returns the amount. */
 export interface OrderPayload {
   customer: OrderCustomer;
   items: { productId: string; variantId: string; qty: number }[];
-  subtotal: number;
-  shipping: number;
   giftWrap: boolean;
-  giftFee: number;
-  total: number;
 }
 
 export interface OrderResult {
   orderId: string;
   status: string;
+  /** Rupees, as computed by the server (includes GST in GST-exclusive mode). */
   amount: number;
   /** The shopper's private handle on this order, issued once at checkout. */
   accessToken?: string;
 }
 
-export interface PaymentResult {
-  status: string;
-  provider: string;
+/** The GST breakup the server returns from POST /cart. Display only; never recomputed here. */
+export type CartTax =
+  | { applied: false }
+  | {
+      applied: true;
+      taxType: 'intra' | 'inter';
+      priceMode: 'inclusive' | 'exclusive' | string;
+      placeOfSupply: { code: string; name: string };
+      stateTaxLabel: 'SGST' | 'UTGST';
+      taxablePaise: number;
+      cgstPaise: number;
+      sgstPaise: number;
+      igstPaise: number;
+      taxPaise: number;
+      roundOffPaise: number;
+      grandTotalPaise: number;
+    };
+
+export interface CartQuote {
+  ok: boolean;
+  subtotal: number;
+  shipping: number;
+  giftFee: number;
+  /** Rupees. Authoritative: what the order will be charged. */
+  total: number;
+  tax: CartTax;
+  /** What the server made of the PIN and state. Absent from older servers. */
+  delivery?: CartDelivery;
+}
+
+export interface CartDelivery {
+  pin: string;
+  /** A human message for the PIN field; empty when the PIN is fine. */
+  pinError: string;
+  zone: 'home' | 'rest' | 'remote' | null;
+  state: { code: string; name: string } | null;
+  district: string;
+}
+
+export type PaymentResult =
+  | { status: 'GATEWAY_NOT_CONFIGURED'; provider?: string; orderId: string; amount: number }
+  | {
+      status: 'CREATED';
+      provider?: string;
+      orderId: string;
+      keyId: string;
+      gatewayOrderId: string;
+      amountPaise: number;
+      amount: number;
+      currency: string;
+    };
+
+export interface PaymentVerification {
+  ok: boolean;
+  paid: boolean;
+  pending: boolean;
   orderId: string;
-  amount: number;
 }

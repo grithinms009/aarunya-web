@@ -2,14 +2,27 @@
 // CONFIG.USE_MOCK switches between the mock data and API_BASE.
 import { CATEGORIES, CONFIG, PRODUCTS } from './config';
 import type {
+  CartQuote,
   Category,
   DeliveryEstimate,
   OrderPayload,
   OrderResult,
   PaymentResult,
+  PaymentVerification,
   Product,
 } from './types';
 import { withMediaOrigin } from './media';
+
+/** An API failure, carrying the server's per-field messages (422) when it sent any. */
+export class ApiError extends Error {
+  fields: Record<string, string>;
+  status: number;
+  constructor(message: string, status: number, fields: Record<string, string> = {}) {
+    super(message);
+    this.status = status;
+    this.fields = fields;
+  }
+}
 
 async function http<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
   const { method = 'GET', body } = init;
@@ -26,8 +39,8 @@ async function http<T>(path: string, init: { method?: string; body?: unknown } =
 
   if (!res.ok) {
     /* The API explains itself in { error, message }; show that rather than a status code. */
-    const msg = (data as { message?: string } | null)?.message;
-    throw new Error(msg ?? `${method} ${path} failed: ${res.status}`);
+    const d = data as { message?: string; fields?: Record<string, string> } | null;
+    throw new ApiError(d?.message ?? `${method} ${path} failed: ${res.status}`, res.status, d?.fields);
   }
   return data as T;
 }
@@ -58,6 +71,8 @@ export interface OrderTracking {
     trackingUrl: string | null;
   } | null;
   returnRequest: { id: string; status: string } | null;
+  /** Present once the tax invoice has been issued (at dispatch). */
+  invoice?: { number: string; issuedAt: string } | null;
   history: { status: string; note: string; at: string }[];
 }
 
@@ -91,13 +106,25 @@ export const api = {
       ? mock({ ok: true })
       : http<{ ok: boolean }>('/cart', { method: 'POST', body: { items } }),
 
-  /** POST /orders — { customer, items, subtotal, shipping, giftWrap, giftFee, total } */
+  /** POST /cart with the delivery state and PIN — the authoritative total and GST breakup.
+   *  The browser only displays what comes back. */
+  quoteCart: (
+    items: { productId: string; variantId: string; qty: number }[],
+    giftWrap: boolean,
+    state?: string,
+    pin?: string,
+  ): Promise<CartQuote> =>
+    CONFIG.USE_MOCK
+      ? Promise.reject(new Error('No tax quote in mock mode'))
+      : http<CartQuote>('/cart', { method: 'POST', body: { items, giftWrap, state, pin } }),
+
+  /** POST /orders — { customer, items, giftWrap }; the server prices and totals the order. */
   createOrder: (order: OrderPayload): Promise<OrderResult> =>
     CONFIG.USE_MOCK
       ? mock({
           orderId: 'AJ' + String(Date.now()).slice(-6),
           status: 'CREATED',
-          amount: order.total,
+          amount: 0,
         })
       : http<OrderResult>('/orders', { method: 'POST', body: order }),
 
@@ -131,18 +158,24 @@ export const api = {
   sendMessage: (body: ContactMessage): Promise<{ ok: boolean; id: number }> =>
     http('/contact', { method: 'POST', body }),
 
-  /** POST /payments/create — backend creates a Razorpay/Cashfree order and returns what the
-   *  checkout SDK needs. No gateway is simulated here. */
-  createPayment: ({ orderId, amount }: { orderId: string; amount: number }): Promise<PaymentResult> =>
+  /** POST /payments/create — the server reads the amount from the order; none is sent.
+   *  Returns GATEWAY_NOT_CONFIGURED until Razorpay keys exist, else what Checkout needs. */
+  createPayment: ({ orderId, token }: { orderId: string; token?: string }): Promise<PaymentResult> =>
     CONFIG.USE_MOCK
-      ? mock({
-          status: 'GATEWAY_NOT_CONFIGURED',
-          provider: CONFIG.PAYMENT_PROVIDER,
-          orderId,
-          amount,
-        })
-      : http<PaymentResult>('/payments/create', {
-          method: 'POST',
-          body: { orderId, amount, provider: CONFIG.PAYMENT_PROVIDER },
-        }),
+      ? mock<PaymentResult>({ status: 'GATEWAY_NOT_CONFIGURED', orderId, amount: 0 })
+      : http<PaymentResult>('/payments/create', { method: 'POST', body: { orderId, token } }),
+
+  /** POST /payments/verify — only `paid: true` from the server means the order is paid. */
+  verifyPayment: (body: {
+    orderId: string;
+    token: string;
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }): Promise<PaymentVerification> =>
+    http<PaymentVerification>('/payments/verify', { method: 'POST', body }),
+
+  /** URL of the customer's tax invoice PDF (GET /orders/{no}/invoice?token=). */
+  invoiceUrl: (orderNo: string, token: string): string =>
+    `${CONFIG.API_BASE}/orders/${encodeURIComponent(orderNo)}/invoice?token=${encodeURIComponent(token)}`,
 };

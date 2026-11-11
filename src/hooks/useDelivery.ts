@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/data/api';
 import { useShop } from '@/store/useStore';
+import { estimateFailure } from '@/lib/pin';
 import type { DeliveryEstimate } from '@/data/types';
 
 /** PIN-code delivery check. The last successful PIN is remembered and re-checked on load. */
@@ -26,7 +27,7 @@ export function useDelivery() {
         const r = await api.checkDelivery(value);
         if (!r.ok) {
           setResult(null);
-          setError('Sorry, we can’t deliver to this PIN code yet.');
+          setError(estimateFailure(r.reason));
         } else {
           setResult(r);
           setStoredPin(value);

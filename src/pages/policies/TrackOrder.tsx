@@ -154,6 +154,36 @@ export function TrackOrder() {
             )}
           </Section>
 
+          {(data.invoice || (!cancelled && !['shipped', 'out', 'delivered'].includes(data.status))) && (
+          <Section h="Tax invoice">
+            {data.invoice ? (
+              <>
+                <P>
+                  Invoice number <strong style={{ color: INK }}>{data.invoice.number}</strong>
+                  {data.invoice.issuedAt && (
+                    <> · issued {new Date(data.invoice.issuedAt).toLocaleDateString('en-IN', {
+                      day: 'numeric', month: 'long', year: 'numeric',
+                    })}</>
+                  )}
+                </P>
+                <a
+                  href={api.invoiceUrl(data.orderId, token.trim())}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    alignSelf: 'flex-start', display: 'inline-block', padding: '11px 22px', borderRadius: 999,
+                    border: '1px solid #2E2826', color: INK, textDecoration: 'none', fontSize: 14,
+                  }}
+                >
+                  Download tax invoice
+                </a>
+              </>
+            ) : (
+              <P>Your tax invoice is issued when your order is dispatched.</P>
+            )}
+          </Section>
+          )}
+
           <Section h="What is in it">
             <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {data.items.map((l, i) => (

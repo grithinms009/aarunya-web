@@ -128,7 +128,7 @@ const setField = async (name, value) => t.ev(`(()=>{const el=document.querySelec
 for (const [k, v] of [['name', 'Asha Menon'], ['phone', '9876500011'], ['email', 'asha@example.com'],
                       ['address', 'MG Road'], ['house', '14B'], ['city', 'Thrissur'],
                       ['state', 'Kerala'], ['pin', '680001']]) await setField(k, v);
-await t.pause(600);
+await t.pause(1800);
 t.clear();
 await t.click('Place Order');
 await t.pause(3500);

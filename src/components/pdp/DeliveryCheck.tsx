@@ -1,6 +1,7 @@
 import { CONFIG } from '@/data/config';
 import { useDelivery } from '@/hooks/useDelivery';
 import { deliveryCopy } from '@/lib/delivery';
+import { placeLine } from '@/lib/pin';
 import { fmt } from '@/lib/format';
 import { Diamond } from '@/components/ui/SectionTitle';
 import { PinIcon } from '@/components/ui/icons';
@@ -91,6 +92,11 @@ export function DeliveryCheck() {
               Change
             </button>
           </div>
+          {placeLine(d.result.district, d.result.state) && (
+            <p style={{ margin: 0, fontSize: 13.5, color: '#756964' }}>
+              {placeLine(d.result.district, d.result.state)}
+            </p>
+          )}
           {copy && (
             <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: '#4A3F3A' }}>
               Arrives by <strong style={{ fontWeight: 600, color: '#8D3545' }}>{copy.date}</strong>. {copy.cut}

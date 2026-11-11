@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "check:business": "node scripts/check-business.mjs",
+    "test:unit": "node --experimental-strip-types test/money.test.mjs && node --experimental-strip-types test/pin.test.mjs",
     "test:flows": "node test/flows.test.mjs"
   },
   "dependencies": {

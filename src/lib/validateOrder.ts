@@ -1,4 +1,4 @@
-import type { OrderCustomer } from '@/data/types';
+import type { BillingDetails, OrderCustomer } from '@/data/types';
 
 export type OrderErrors = Partial<Record<keyof OrderCustomer, string>>;
 
@@ -18,5 +18,20 @@ export function validateOrder(f: OrderCustomer): OrderErrors {
   if (!f.state) e.state = 'Please choose your state.';
   if (!/^\d{6}$/.test(f.pin)) e.pin = 'Enter a 6-digit PIN code.';
 
+  return e;
+}
+
+export type BillingErrors = Partial<Record<keyof BillingDetails, string>>;
+
+/** Billing fields, checked only when "billing differs from delivery" is on. The GSTIN is
+ *  optional and validated by the server (it knows the check digit and state codes). */
+export function validateBilling(b: BillingDetails): BillingErrors {
+  const e: BillingErrors = {};
+  if (!b.name.trim()) e.name = 'Please enter the billing name.';
+  if (!b.address.trim()) e.address = 'Please enter the billing address.';
+  if (!b.city.trim()) e.city = 'Please enter the billing city.';
+  if (!b.state) e.state = 'Please choose the billing state.';
+  if (!/^\d{6}$/.test(b.pin)) e.pin = 'Enter a 6-digit PIN code.';
+  if (b.gstin.trim() && b.gstin.trim().length !== 15) e.gstin = 'A GSTIN has 15 characters.';
   return e;
 }

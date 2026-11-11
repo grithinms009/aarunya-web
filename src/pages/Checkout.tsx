@@ -1,20 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Seo } from '@/components/ui/Seo';
 import { LockIcon } from '@/components/ui/icons';
-import { api } from '@/data/api';
+import { api, ApiError } from '@/data/api';
 import { rememberLastOrder } from '@/lib/lastOrder';
 import { STATES } from '@/data/config';
 import { useCart } from '@/hooks/useCart';
 import { useViewport } from '@/hooks/useViewport';
-import { validateOrder, type OrderErrors } from '@/lib/validateOrder';
+import { validateBilling, validateOrder, type BillingErrors, type OrderErrors } from '@/lib/validateOrder';
+import { isPin, matchState, placeLine } from '@/lib/pin';
+import { fmt } from '@/lib/format';
+import { fmtPaise } from '@/lib/money';
+import { loadRazorpay } from '@/lib/razorpay';
+import { BRAND_NAME } from '@/config/businessInfo';
 import { useShop, useUi } from '@/store/useStore';
-import type { OrderCustomer } from '@/data/types';
+import type { BillingDetails, CartQuote, OrderCustomer } from '@/data/types';
 import pill from '@/components/ui/Pill.module.css';
 import cls from './Checkout.module.css';
 
 interface FieldDef {
-  k: keyof OrderCustomer;
+  k: Exclude<keyof OrderCustomer, 'billing'> | keyof BillingDetails;
   label: string;
   type?: string;
   inputMode?: 'text' | 'numeric' | 'email' | 'tel';
@@ -39,10 +44,40 @@ const ADDRESS: FieldDef[] = [
   { k: 'pin', label: 'PIN Code', inputMode: 'numeric', autoComplete: 'postal-code' },
 ];
 
+const BILLING: FieldDef[] = [
+  { k: 'name', label: 'Billing Name', full: true },
+  { k: 'address', label: 'Billing Address', full: true },
+  { k: 'city', label: 'City' },
+  { k: 'state', label: 'State', select: true },
+  { k: 'pin', label: 'PIN Code', inputMode: 'numeric' },
+  { k: 'gstin', label: 'GSTIN (optional, for business purchases)', full: true },
+];
+
 const BLANK: OrderCustomer = {
   name: '', phone: '', email: '', address: '', house: '', landmark: '', city: '',
   state: 'Kerala', pin: '',
 };
+
+const BLANK_BILLING: BillingDetails = { name: '', address: '', city: '', state: 'Kerala', pin: '', gstin: '' };
+
+/** Where a placed order stands. Only the server's answers move it to 'paid' or 'confirming'. */
+type PayPhase =
+  | 'not_configured' // no gateway keys yet: order placed, payment window opens once live
+  | 'ready' // gateway order exists, window not open (dismissed, failed or just placed)
+  | 'opening'
+  | 'verifying'
+  | 'paid'
+  | 'confirming'; // verify said the payment is not captured yet
+
+interface PlacedOrder {
+  orderId: string;
+  token?: string;
+  /** Rupees, from the server. */
+  amount: number;
+  phase: PayPhase;
+  payStatus: string;
+  notice?: string;
+}
 
 const policyLink: React.CSSProperties = {
   color: '#2E2826',
@@ -59,55 +94,195 @@ export function Checkout() {
   const [form, setForm] = useState<OrderCustomer>(BLANK);
   const [errs, setErrs] = useState<OrderErrors>({});
   const [placing, setPlacing] = useState(false);
-  const [order, setOrder] = useState<{ orderId: string; payStatus: string; token?: string } | null>(null);
+  const [order, setOrder] = useState<PlacedOrder | null>(null);
+  const [billingOn, setBillingOn] = useState(false);
+  const [billing, setBilling] = useState<BillingDetails>(BLANK_BILLING);
+  const [bErrs, setBErrs] = useState<BillingErrors>({});
+  /* The server's total and GST breakup for this bag + delivery state. */
+  const [quote, setQuote] = useState<CartQuote | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const customerRef = useRef(form);
+  customerRef.current = form;
+
+  const quoteKey = JSON.stringify([
+    cart.lines.map((l) => [l.pid, l.vid, l.qty]),
+    gift,
+    form.state,
+    isPin(form.pin) ? form.pin : '',
+  ]);
+  useEffect(() => {
+    if (order || !cart.lines.length) return;
+    let live = true;
+    setQuoting(true);
+    const t = setTimeout(() => {
+      api
+        .quoteCart(
+          cart.lines.map((l) => ({ productId: l.pid, variantId: l.vid, qty: l.qty })),
+          gift,
+          form.state,
+          isPin(form.pin) ? form.pin : undefined,
+        )
+        .then((q) => {
+          if (!live) return;
+          setQuote(q);
+          /* The server derives the state from the PIN; show it in the dropdown. */
+          const st = matchState(q.delivery?.state?.name, STATES);
+          if (st) setForm((f) => (isPin(f.pin) && f.pin === q.delivery?.pin && f.state !== st ? { ...f, state: st } : f));
+        })
+        .catch(() => live && setQuote(null))
+        .finally(() => live && setQuoting(false));
+    }, 350);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+    // quoteKey captures lines, gift and state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteKey, !!order]);
+
+  const setB = (k: keyof BillingDetails, value: string) => {
+    setBilling((b) => ({ ...b, [k]: k === 'gstin' ? value.toUpperCase() : value }));
+    setBErrs((e) => ({ ...e, [k]: '' }));
+  };
 
   const set = (k: keyof OrderCustomer, value: string) => {
     setForm((f) => ({ ...f, [k]: value }));
     setErrs((e) => ({ ...e, [k]: '' }));
   };
 
+  /** Opens Razorpay for an order the server has priced. Amount, key and gateway order id all
+   *  come from POST /payments/create; nothing here sets or changes an amount. */
+  const startPayment = async (o: { orderId: string; token?: string }) => {
+    setOrder((p) => (p ? { ...p, phase: 'opening', notice: undefined } : p));
+    try {
+      const pay = await api.createPayment({ orderId: o.orderId, token: o.token });
+      if (pay.status !== 'CREATED') {
+        setOrder((p) => (p ? { ...p, phase: 'not_configured', payStatus: pay.status } : p));
+        return;
+      }
+      await loadRazorpay();
+      const c = customerRef.current;
+      const Razorpay = window.Razorpay!;
+      const rzp = new Razorpay({
+        key: pay.keyId,
+        order_id: pay.gatewayOrderId,
+        amount: pay.amountPaise,
+        currency: pay.currency,
+        name: BRAND_NAME,
+        description: `Order ${pay.orderId}`,
+        prefill: { name: c.name, email: c.email, contact: c.phone },
+        theme: { color: '#8D3545' },
+        handler: (r) => {
+          setOrder((p) => (p ? { ...p, phase: 'verifying' } : p));
+          api
+            .verifyPayment({ orderId: pay.orderId, token: o.token ?? '', ...r })
+            .then((v) => {
+              if (v.paid) {
+                setOrder((p) => (p ? { ...p, phase: 'paid', payStatus: 'paid' } : p));
+                return;
+              }
+              setOrder((p) =>
+                p
+                  ? v.pending
+                    ? { ...p, phase: 'confirming' }
+                    : { ...p, phase: 'ready', notice: 'We could not confirm that payment. If money was debited, it will be reconciled or refunded; you can also try again below.' }
+                  : p,
+              );
+            })
+            .catch(() =>
+              setOrder((p) =>
+                p
+                  ? { ...p, phase: 'confirming', notice: 'We could not reach our server to confirm your payment. If money was debited, your order will be confirmed shortly; check Track Order before paying again.' }
+                  : p,
+              ),
+            );
+        },
+        modal: {
+          ondismiss: () =>
+            setOrder((p) =>
+              p && p.phase === 'opening'
+                ? { ...p, phase: 'ready', notice: 'The payment window was closed. Your order is saved and unpaid; you can pay now.' }
+                : p,
+            ),
+        },
+      });
+      rzp.on('payment.failed', (r) =>
+        setOrder((p) =>
+          p
+            ? { ...p, phase: 'ready', notice: `${r.error?.description ?? 'The payment did not go through.'} Your order is still unpaid; you can try again.` }
+            : p,
+        ),
+      );
+      rzp.open();
+    } catch (err) {
+      setOrder((p) =>
+        p
+          ? { ...p, phase: 'ready', notice: err instanceof Error ? err.message : 'The payment window could not open. Please try again.' }
+          : p,
+      );
+    }
+  };
+
   const placeOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     const found = validateOrder(form);
     setErrs(found);
-    if (Object.keys(found).some((k) => found[k as keyof OrderCustomer])) return;
+    const bFound = billingOn ? validateBilling(billing) : {};
+    setBErrs(bFound);
+    if (Object.values(found).some(Boolean) || Object.values(bFound).some(Boolean)) return;
 
     setPlacing(true);
     try {
       const created = await api.createOrder({
-        customer: form,
+        customer: { ...form, ...(billingOn ? { billing: { ...billing, gstin: billing.gstin.trim() } } : {}) },
         items: cart.lines.map((l) => ({
           productId: l.pid,
           variantId: l.vid,
           qty: l.qty,
         })),
-        subtotal: cart.raw.subtotal,
-        shipping: cart.raw.shipping,
         giftWrap: gift,
-        giftFee: cart.raw.giftFee,
-        total: cart.raw.total,
       });
-      // In production, open the Razorpay/Cashfree checkout here with this payload and
-      // handle its success and failure callbacks.
-      const pay = await api.createPayment({ orderId: created.orderId, amount: cart.raw.total });
       /* Remember it so Track Order fills itself in on this device. */
       if (created.accessToken) {
         rememberLastOrder({ orderId: created.orderId, token: created.accessToken });
       }
-      setOrder({ orderId: created.orderId, payStatus: pay.status, token: created.accessToken });
+      setOrder({ orderId: created.orderId, token: created.accessToken, amount: created.amount, phase: 'opening', payStatus: '' });
       setPlacing(false);
       window.scrollTo(0, 0);
-    } catch {
+      await startPayment({ orderId: created.orderId, token: created.accessToken });
+    } catch (err) {
       setPlacing(false);
-      flash('Something went wrong. Please try again.');
+      if (err instanceof ApiError && err.fields) {
+        const f = err.fields;
+        if (f.pin) setErrs((x) => ({ ...x, pin: f.pin }));
+        if (f.state) setErrs((x) => ({ ...x, state: f.state }));
+        if (f.gstin) setBErrs((x) => ({ ...x, gstin: f.gstin }));
+      }
+      flash(err instanceof Error && err.message ? err.message : 'Something went wrong. Please try again.');
     }
   };
 
-  const hasErrors = Object.values(errs).some(Boolean);
+  /* PIN feedback from the quote, only while it still describes the PIN on screen. */
+  const pinLive = isPin(form.pin) && quote?.delivery?.pin !== undefined;
+  const pinError = isPin(form.pin) && quote?.delivery && !quoting ? quote.delivery.pinError : '';
+  const pinPlace =
+    pinLive && !pinError && quote?.delivery?.pin === form.pin
+      ? placeLine(quote.delivery.district, quote.delivery.state?.name)
+      : '';
+  const pinBlocked = !isPin(form.pin) || !!pinError;
 
-  const renderField = (fd: FieldDef) => {
-    const id = 'co-' + fd.k;
-    const err = errs[fd.k];
+  const hasErrors = Object.values(errs).some(Boolean) || Object.values(bErrs).some(Boolean);
+
+  /** One bound input. The delivery fields and the billing fields share this markup. */
+  const renderField = (fd: FieldDef, billingField = false) => {
+    const id = (billingField ? 'co-bill-' : 'co-') + fd.k;
+    const fieldName = billingField ? 'billing_' + fd.k : fd.k;
+    const baseErr = (billingField ? bErrs : errs)[fd.k as keyof BillingDetails & keyof OrderCustomer];
+    const isDeliveryPin = !billingField && fd.k === 'pin';
+    const err = baseErr || (isDeliveryPin ? pinError : '');
+    const value = String((billingField ? billing : form)[fd.k as keyof BillingDetails & keyof OrderCustomer] ?? '');
+    const onChange = (v: string) =>
+      billingField ? setB(fd.k as keyof BillingDetails, v) : set(fd.k as keyof OrderCustomer, v);
     return (
       <div key={fd.k} className={cls.field} style={{ gridColumn: fd.full ? '1 / -1' : 'auto' }}>
         <label htmlFor={id} className={cls.label}>
@@ -116,10 +291,10 @@ export function Checkout() {
         {fd.select ? (
           <select
             id={id}
-            name={fd.k}
-            autoComplete="address-level1"
-            value={form[fd.k]}
-            onChange={(e) => set(fd.k, e.target.value)}
+            name={fieldName}
+            autoComplete={billingField ? 'off' : 'address-level1'}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             aria-invalid={err ? true : undefined}
             className={cls.select}
             style={{ border: `1px solid ${err ? '#8D3545' : '#E3CFC8'}` }}
@@ -133,12 +308,12 @@ export function Checkout() {
         ) : (
           <input
             id={id}
-            name={fd.k}
+            name={fieldName}
             type={fd.type ?? 'text'}
             inputMode={fd.inputMode}
             autoComplete={fd.autoComplete}
-            value={form[fd.k]}
-            onChange={(e) => set(fd.k, e.target.value)}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             aria-invalid={err ? true : undefined}
             className={cls.input}
             style={{ border: `1px solid ${err ? '#8D3545' : '#E3CFC8'}` }}
@@ -148,6 +323,9 @@ export function Checkout() {
           <span role="alert" className={cls.err}>
             {err}
           </span>
+        )}
+        {isDeliveryPin && !err && pinPlace && (
+          <span style={{ fontSize: 12.5, color: '#756964' }}>{pinPlace}</span>
         )}
       </div>
     );
@@ -183,13 +361,38 @@ export function Checkout() {
             Thank you ♡
           </span>
           <h2 style={{ margin: 0, fontFamily: "'Cormorant Garamond',serif", fontWeight: 500, fontSize: 'clamp(28px,4vw,38px)' }}>
-            Order {order.orderId} is ready for payment
+            {order.phase === 'paid'
+              ? `Order ${order.orderId} is confirmed`
+              : order.phase === 'confirming'
+                ? `Order ${order.orderId}: payment is being confirmed`
+                : `Order ${order.orderId} is ready for payment`}
           </h2>
           <p style={{ margin: 0, fontSize: 14.5, color: '#756964', lineHeight: 1.65, maxWidth: '30em' }}>
-            Total {cart.total}. The secure online payment window will open here once the payment
-            gateway is connected.
+            {order.phase === 'paid' && `Payment successful. We received ${fmt(order.amount)}.`}
+            {order.phase === 'confirming' && `Your payment of ${fmt(order.amount)} is being confirmed. This page does not need to stay open; Track Order will show the result.`}
+            {order.phase === 'verifying' && 'Confirming your payment…'}
+            {order.phase === 'opening' && `Total ${fmt(order.amount)}. Opening the secure payment window…`}
+            {order.phase === 'ready' && `Total ${fmt(order.amount)}. Your order is saved and unpaid until payment is completed.`}
+            {order.phase === 'not_configured' && `Total ${fmt(order.amount)}. The secure online payment window will open here once the payment gateway is connected.`}
           </p>
-          <code className={cls.payCode}>POST /payments/create → {order.payStatus}</code>
+          {order.notice && (
+            <p role="alert" style={{ margin: 0, fontSize: 13.5, color: '#8D3545', lineHeight: 1.6, maxWidth: '32em' }}>
+              {order.notice}
+            </p>
+          )}
+          {order.phase === 'not_configured' && (
+            <code className={cls.payCode}>POST /payments/create → {order.payStatus}</code>
+          )}
+          {order.phase === 'ready' && (
+            <button
+              type="button"
+              className={cls.submit}
+              style={{ maxWidth: 320 }}
+              onClick={() => void startPayment(order)}
+            >
+              Pay {fmt(order.amount)}
+            </button>
+          )}
 
           {order.token && (
             <div style={{ marginTop: 4, padding: '14px 16px', background: '#FBF7F4', border: '1px solid #EFE6DF', borderRadius: 10, maxWidth: '34em', textAlign: 'left' }}>
@@ -223,12 +426,35 @@ export function Checkout() {
           <form onSubmit={placeOrder} noValidate className={cls.form}>
             <fieldset className={cls.fieldset} style={{ gridTemplateColumns: L.fCols }}>
               <legend className={cls.legend}>Contact</legend>
-              {CONTACT.map(renderField)}
+              {CONTACT.map((fd) => renderField(fd))}
             </fieldset>
 
             <fieldset className={cls.fieldset} style={{ gridTemplateColumns: L.fCols }}>
               <legend className={cls.legend}>Delivery address</legend>
-              {ADDRESS.map(renderField)}
+              {ADDRESS.map((fd) => renderField(fd))}
+            </fieldset>
+
+            <fieldset className={cls.fieldset} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <legend className={cls.legend}>Billing</legend>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={billingOn}
+                  onChange={(e) => {
+                    setBillingOn(e.target.checked);
+                    if (e.target.checked && !billing.name) {
+                      setBilling({ ...BLANK_BILLING, name: form.name, state: form.state });
+                    }
+                  }}
+                  style={{ width: 18, height: 18, accentColor: '#8D3545', margin: 0 }}
+                />
+                Billing address differs from delivery
+              </label>
+              {billingOn && (
+                <div style={{ display: 'grid', gap: 16, gridTemplateColumns: L.fCols }}>
+                  {BILLING.map((fd) => renderField(fd, true))}
+                </div>
+              )}
             </fieldset>
 
             <fieldset className={cls.fieldset} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -262,8 +488,8 @@ export function Checkout() {
               or UPI details.
             </p>
 
-            <button type="submit" disabled={placing} className={cls.submit} style={{ opacity: placing ? 0.6 : 1 }}>
-              {placing ? 'Placing order…' : `Place Order · ${cart.total}`}
+            <button type="submit" disabled={placing || quoting || pinBlocked} className={cls.submit} style={{ opacity: placing || quoting || pinBlocked ? 0.6 : 1 }}>
+              {placing ? 'Placing order…' : `Place Order · ${quote ? fmt(quote.total) : cart.total}`}
             </button>
           </form>
 
@@ -290,22 +516,64 @@ export function Checkout() {
             <div className={cls.divider} />
             <div className={cls.row}>
               <span style={{ color: '#756964' }}>Subtotal</span>
-              <span>{cart.subtotal}</span>
+              <span>{quote ? fmt(quote.subtotal) : cart.subtotal}</span>
             </div>
             <div className={cls.row}>
               <span style={{ color: '#756964' }}>Shipping</span>
-              <span style={{ color: cart.shipColor }}>{cart.shipping}</span>
+              <span style={{ color: cart.shipColor }}>
+                {quote ? (quote.shipping === 0 ? 'FREE' : fmt(quote.shipping)) : cart.shipping}
+              </span>
             </div>
-            {cart.gift && (
+            {(quote ? quote.giftFee > 0 : cart.gift) && (
               <div className={cls.row} style={{ fontSize: 13.5 }}>
                 <span style={{ color: '#756964' }}>Gift wrap</span>
-                <span>{cart.giftFee}</span>
+                <span>{quote ? fmt(quote.giftFee) : cart.giftFee}</span>
               </div>
+            )}
+            {quote?.tax.applied && (
+              <>
+                <div className={cls.divider} />
+                <div className={cls.row} style={{ fontSize: 13, color: '#756964' }}>
+                  <span>{quote.tax.priceMode === 'exclusive' ? 'GST added to your total' : 'Includes GST'}</span>
+                  <span>{fmtPaise(quote.tax.taxPaise)}</span>
+                </div>
+                <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                  <span>Taxable value</span>
+                  <span>{fmtPaise(quote.tax.taxablePaise)}</span>
+                </div>
+                {quote.tax.taxType === 'intra' ? (
+                  <>
+                    <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                      <span>CGST</span>
+                      <span>{fmtPaise(quote.tax.cgstPaise)}</span>
+                    </div>
+                    <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                      <span>{quote.tax.stateTaxLabel}</span>
+                      <span>{fmtPaise(quote.tax.sgstPaise)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                    <span>IGST</span>
+                    <span>{fmtPaise(quote.tax.igstPaise)}</span>
+                  </div>
+                )}
+                {quote.tax.roundOffPaise !== 0 && (
+                  <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                    <span>Round off</span>
+                    <span>{fmtPaise(quote.tax.roundOffPaise)}</span>
+                  </div>
+                )}
+                <div className={cls.row} style={{ fontSize: 12.5, color: '#756964' }}>
+                  <span>Place of supply</span>
+                  <span>{quote.tax.placeOfSupply.name} ({quote.tax.placeOfSupply.code})</span>
+                </div>
+              </>
             )}
             <div className={cls.divider} />
             <div className={cls.row} style={{ fontSize: 17, fontWeight: 500 }}>
               <span>Total</span>
-              <span>{cart.total}</span>
+              <span>{quote ? fmt(quote.total) : cart.total}</span>
             </div>
             <p style={{ margin: 0, fontSize: 12.5, color: '#756964', background: '#FBEFEF', borderRadius: 10, padding: '10px 12px' }}>
               {cart.shipMsg}
