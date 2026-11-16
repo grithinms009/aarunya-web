@@ -39,8 +39,9 @@ export function AboutUs() {
       <Section h="Who runs it">
         <P>
           The shop is owned and run by{' '}
-          <Detail value={MERCHANT.legalName} what="owner's name" />, trading as {BRAND_NAME}
-          {MERCHANT.constitution ? `, a ${MERCHANT.constitution}` : ''} from {ADDRESS.city},{' '}
+          <Detail value={MERCHANT.legalName} what="owner's name" />
+          {MERCHANT.constitution ? `, ${MERCHANT.constitution},` : ','} trading as {BRAND_NAME}{' '}
+          from {ADDRESS.city},{' '}
           {ADDRESS.state}. Orders are packed and posted by the same person who answers your
           messages.
         </P>

@@ -41,8 +41,9 @@ export function Terms() {
       <Section h="Who we are" id="who-we-are">
         <P>
           This website is owned and operated by{' '}
-          <Detail value={MERCHANT.legalName} what="owner's name" />, trading as {BRAND_NAME}
-          {MERCHANT.constitution ? `, a ${MERCHANT.constitution},` : ','} based in{' '}
+          <Detail value={MERCHANT.legalName} what="owner's name" />
+          {MERCHANT.constitution ? `, ${MERCHANT.constitution},` : ','} trading as {BRAND_NAME},
+          based in{' '}
           {ADDRESS.state}, {ADDRESS.country}.
         </P>
         <P>

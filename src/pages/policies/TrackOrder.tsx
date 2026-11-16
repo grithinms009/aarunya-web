@@ -14,7 +14,7 @@ import { P, PolicyLink, PolicyPage, Section } from '@/components/ui/Policy';
 import { api, type OrderTracking } from '@/data/api';
 import { fmt } from '@/lib/format';
 import { readLastOrder } from '@/lib/lastOrder';
-import { RETURNS, SHIPPING, SUPPORT } from '@/config/businessInfo';
+import { GST_REGISTERED, RETURNS, SHIPPING, SUPPORT } from '@/config/businessInfo';
 
 const INK = '#2E2826';
 const MUTED = '#756964';
@@ -154,7 +154,8 @@ export function TrackOrder() {
             )}
           </Section>
 
-          {(data.invoice || (!cancelled && !['shipped', 'out', 'delivered'].includes(data.status))) && (
+          {/* Promise an invoice only when the shop can issue one: an unregistered seller cannot. */}
+          {(data.invoice || (GST_REGISTERED && !cancelled && !['shipped', 'out', 'delivered'].includes(data.status))) && (
           <Section h="Tax invoice">
             {data.invoice ? (
               <>

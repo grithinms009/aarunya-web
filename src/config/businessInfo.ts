@@ -58,16 +58,24 @@ export const MERCHANT = {
   /** The owner's name, as supplied by the merchant. */
   legalName: 'Veena G' as Supplied<string>,
   /**
-   * How the business is constituted, e.g. 'Sole proprietorship'.
+   * How the business is constituted, written to follow the owner's name ("Veena G, an
+   * individual seller, trading as …").
    *
-   * Still null on purpose: the shop is not registered as a company, but the merchant has
-   * not confirmed the exact wording to use, and inventing a legal status is precisely the
-   * kind of claim that must not appear. The pages read correctly without it.
+   * Confirmed by the merchant: the Razorpay account is opened under the "Individual"
+   * business type, i.e. a person selling in their own name, with no company, firm or
+   * GST registration behind it. Keep this in step with that application.
    */
-  constitution: null as Supplied<string>,
-  /** Set only if the merchant actually holds one; leave null otherwise. */
+  constitution: 'an individual seller' as Supplied<string>,
+  /**
+   * Set only if the merchant actually holds an active GST registration; leave null
+   * otherwise. While null the site shows no GSTIN field at checkout and promises no tax
+   * invoice, because an unregistered seller can neither charge GST nor issue one.
+   */
   gstin: null as Supplied<string>,
 };
+
+/** True only once a GSTIN is recorded above. Gates every GST affordance on the site. */
+export const GST_REGISTERED = MERCHANT.gstin !== null;
 
 /**
  * The address shown publicly.
@@ -276,7 +284,7 @@ export function missingBusinessInfo(): MissingDetail[] {
   need(MERCHANT.legalName, 'MERCHANT.legalName',
     'The proprietor’s full legal name, for Terms and the Razorpay application.');
   need(MERCHANT.constitution, 'MERCHANT.constitution',
-    'How the business is constituted, e.g. "Sole proprietorship".');
+    'How the business is constituted, e.g. "an individual seller".');
   need(ADDRESS.line1, 'ADDRESS.line1', 'Street address, shown on Contact and used for returns.');
   need(ADDRESS.city, 'ADDRESS.city', 'City or town of the operating address.');
   need(ADDRESS.pin, 'ADDRESS.pin', 'PIN code of the operating address.');

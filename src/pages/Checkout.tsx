@@ -12,7 +12,7 @@ import { isPin, matchState, placeLine } from '@/lib/pin';
 import { fmt } from '@/lib/format';
 import { fmtPaise } from '@/lib/money';
 import { loadRazorpay } from '@/lib/razorpay';
-import { BRAND_NAME } from '@/config/businessInfo';
+import { BRAND_NAME, GST_REGISTERED } from '@/config/businessInfo';
 import { useShop, useUi } from '@/store/useStore';
 import type { BillingDetails, CartQuote, OrderCustomer } from '@/data/types';
 import pill from '@/components/ui/Pill.module.css';
@@ -50,7 +50,11 @@ const BILLING: FieldDef[] = [
   { k: 'city', label: 'City' },
   { k: 'state', label: 'State', select: true },
   { k: 'pin', label: 'PIN Code', inputMode: 'numeric' },
-  { k: 'gstin', label: 'GSTIN (optional, for business purchases)', full: true },
+  /* A buyer's GSTIN is only useful against a GST invoice, which an unregistered seller
+     cannot issue, so the field appears only once the shop is GST-registered. */
+  ...(GST_REGISTERED
+    ? [{ k: 'gstin', label: 'GSTIN (optional, for business purchases)', full: true } as FieldDef]
+    : []),
 ];
 
 const BLANK: OrderCustomer = {
