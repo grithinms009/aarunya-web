@@ -9,7 +9,7 @@ import { P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Poli
 import { api } from '@/data/api';
 import { instagramUrl, whatsappUrl } from '@/lib/format';
 import {
-  ADDRESS, BRAND_NAME, GRIEVANCE, SUPPORT, addressLine,
+  ADDRESS, BRAND_NAME, GRIEVANCE, GST_REGISTERED, MERCHANT, SUPPORT, addressLine,
 } from '@/config/businessInfo';
 
 const INK = '#2E2826';
@@ -139,6 +139,7 @@ export function ContactUs() {
         <P>
           <Detail value={addressLine()} what="full operating address" />
         </P>
+        {GST_REGISTERED && <P>GSTIN: {MERCHANT.gstin}</P>}
         <P>
           This is also the address returns are sent to — please check with us before posting
           anything back, as set out in{' '}

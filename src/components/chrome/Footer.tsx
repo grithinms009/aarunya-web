@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { instagramUrl, whatsappUrl } from '@/lib/format';
 import { useViewport } from '@/hooks/useViewport';
 import { LockIcon } from '@/components/ui/icons';
-import { SUPPORT, addressLine } from '@/config/businessInfo';
+import { GST_REGISTERED, MERCHANT, SUPPORT, addressLine } from '@/config/businessInfo';
 import s from './Footer.module.css';
 
 const SHOP_LINKS = [
@@ -94,6 +94,9 @@ export function Footer() {
             <span className={s.colLink} style={{ cursor: 'default', lineHeight: 1.6 }}>
               {addressLine()}
             </span>
+          )}
+          {GST_REGISTERED && (
+            <span className={s.colLink} style={{ cursor: 'default' }}>GSTIN: {MERCHANT.gstin}</span>
           )}
         </nav>
       </div>

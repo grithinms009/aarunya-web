@@ -51,27 +51,26 @@ export const BRAND_NAME = 'Aarunya Jewels by Veena';
 /**
  * The person or entity legally behind the shop, and how it is constituted.
  *
- * The business is not registered as a company, so nothing here may describe it as a
- * private limited company, a GST-registered entity or a certified jeweller.
+ * A sole proprietorship registered under GST (needed because the shop sells across
+ * state lines). It is not a company, so nothing here may describe it as a private
+ * limited company, and nothing may call it a certified jeweller.
  */
 export const MERCHANT = {
   /** The owner's name, as supplied by the merchant. */
   legalName: 'Veena G' as Supplied<string>,
   /**
-   * How the business is constituted, written to follow the owner's name ("Veena G, an
-   * individual seller, trading as …").
-   *
-   * Confirmed by the merchant: the Razorpay account is opened under the "Individual"
-   * business type, i.e. a person selling in their own name, with no company, firm or
-   * GST registration behind it. Keep this in step with that application.
+   * How the business is constituted, written to follow the owner's name ("Veena G, a
+   * sole proprietor, trading as …"). The GSTIN's PAN has 'P' as its 4th character, an
+   * individual proprietor, which matches. Keep it in step with the Razorpay application.
    */
-  constitution: 'an individual seller' as Supplied<string>,
+  constitution: 'a sole proprietor' as Supplied<string>,
   /**
-   * Set only if the merchant actually holds an active GST registration; leave null
-   * otherwise. While null the site shows no GSTIN field at checkout and promises no tax
-   * invoice, because an unregistered seller can neither charge GST nor issue one.
+   * The merchant's GSTIN. The merchant confirmed the registration was taken for interstate
+   * selling and is given to Razorpay. While set, the site shows the GSTIN, the buyer's
+   * GSTIN field at checkout and the tax-invoice section on Track Order. Whether GST is
+   * actually charged is decided by the backend's GST settings, not by this value.
    */
-  gstin: null as Supplied<string>,
+  gstin: '32BTBPG5961M1ZK' as Supplied<string>,
 };
 
 /** True only once a GSTIN is recorded above. Gates every GST affordance on the site. */
@@ -284,7 +283,7 @@ export function missingBusinessInfo(): MissingDetail[] {
   need(MERCHANT.legalName, 'MERCHANT.legalName',
     'The proprietor’s full legal name, for Terms and the Razorpay application.');
   need(MERCHANT.constitution, 'MERCHANT.constitution',
-    'How the business is constituted, e.g. "an individual seller".');
+    'How the business is constituted, e.g. "a sole proprietor".');
   need(ADDRESS.line1, 'ADDRESS.line1', 'Street address, shown on Contact and used for returns.');
   need(ADDRESS.city, 'ADDRESS.city', 'City or town of the operating address.');
   need(ADDRESS.pin, 'ADDRESS.pin', 'PIN code of the operating address.');

@@ -8,7 +8,7 @@
 import { List, P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
 import { fmt } from '@/lib/format';
 import {
-  ADDRESS, BRAND_NAME, MERCHANT, PAYMENTS, RETURNS, SHIPPING, SUPPORT, addressLine,
+  ADDRESS, BRAND_NAME, GST_REGISTERED, MERCHANT, PAYMENTS, RETURNS, SHIPPING, SUPPORT, addressLine,
 } from '@/config/businessInfo';
 
 export function Terms() {
@@ -52,6 +52,7 @@ export function Terms() {
           <Detail value={SUPPORT.email} what="support email" /> or{' '}
           <Detail value={SUPPORT.phone} what="support phone" />.
         </P>
+        {GST_REGISTERED && <P>GSTIN: {MERCHANT.gstin}</P>}
       </Section>
 
       <Section h="Eligibility" id="eligibility">
@@ -77,7 +78,7 @@ export function Terms() {
 
       <Section h="Prices" id="prices">
         <P>
-          All prices are in Indian Rupees and include applicable taxes. Delivery charges,
+          All prices are in Indian Rupees and include GST and any other applicable taxes. Delivery charges,
           where they apply, are shown separately at checkout before you pay.
         </P>
         <P>
