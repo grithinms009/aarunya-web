@@ -2,8 +2,8 @@
  *
  * The officer's name, designation and contact details are not invented: until the
  * merchant names a real person, those fields render as pending and the page says so.
- * The acknowledgement and resolution commitments are left for the merchant to set,
- * because they are promises, not boilerplate.
+ * The 48-hour acknowledgement and one-month resolution follow Rule 4(5) of the Consumer
+ * Protection (E-Commerce) Rules, 2020; the merchant agreed to them on 18 November 2026.
  */
 import { List, P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Policy';
 import { BRAND_NAME, GRIEVANCE, SUPPORT, addressLine } from '@/config/businessInfo';
@@ -78,10 +78,9 @@ export function Grievance() {
           a small shop: the person who answers your complaint is the person who runs it.
         </P>
         <P>
-          We have not published a fixed acknowledgement or resolution deadline, because we
-          would rather not commit to a timescale we cannot be certain of keeping. We aim to
-          come back to you quickly, and we will tell you if something is going to take
-          longer than expected.
+          We acknowledge every complaint within 48 hours of receiving it, and resolve it
+          within one month. If something needs longer to look into, we will tell you why and
+          keep you updated until it is settled.
         </P>
       </Section>
 

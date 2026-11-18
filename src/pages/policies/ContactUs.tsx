@@ -9,7 +9,8 @@ import { P, PolicyLink, PolicyPage, Section, Detail } from '@/components/ui/Poli
 import { api } from '@/data/api';
 import { instagramUrl, whatsappUrl } from '@/lib/format';
 import {
-  ADDRESS, BRAND_NAME, GRIEVANCE, GST_REGISTERED, MERCHANT, SUPPORT, addressLine,
+  ADDRESS, BRAND_NAME, GRIEVANCE, GST_REGISTERED, MERCHANT, RETURN_ADDRESS_POLICY, SUPPORT,
+  addressLine,
 } from '@/config/businessInfo';
 
 const INK = '#2E2826';
@@ -140,15 +141,10 @@ export function ContactUs() {
           <Detail value={addressLine()} what="full operating address" />
         </P>
         {GST_REGISTERED && <P>GSTIN: {MERCHANT.gstin}</P>}
-        <P>
-          This is also the address returns are sent to — please check with us before posting
-          anything back, as set out in{' '}
-          <PolicyLink to="/returns-and-replacements">Returns and Replacements</PolicyLink>.
-        </P>
         <P style={{ fontSize: 13.5 }}>
-          We are an online shop operating from {ADDRESS.state}; this is our correspondence
-          and return address, not a walk-in showroom. Please do not post anything back
-          before we have confirmed a return.
+          We are an online shop operating from {ADDRESS.state}, not a walk-in showroom.{' '}
+          {RETURN_ADDRESS_POLICY} See{' '}
+          <PolicyLink to="/returns-and-replacements">Returns and Replacements</PolicyLink>.
         </P>
       </Section>
 

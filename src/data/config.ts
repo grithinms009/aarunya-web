@@ -26,7 +26,6 @@ export const CONFIG = {
   SHIPPING_FEE: 60,
   PAYMENT_PROVIDER: 'razorpay' as 'razorpay' | 'cashfree',
   GIFT_WRAP_FEE: 49, // REVIEW — set 0 for free gift wrap
-  DISPATCH_CUTOFF_HOUR: 16, // orders before 4 pm dispatch the same working day
   HOME_STATE_PIN_PREFIXES: ['67', '68', '69'], // Kerala — faster delivery
   DELIVERY_DAYS: { local: [2, 3], rest: [4, 7] } as Record<string, [number, number]>,
   /* Return policy, filled from the API: the admin edits these under Returns. */

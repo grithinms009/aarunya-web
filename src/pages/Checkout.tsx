@@ -384,9 +384,6 @@ export function Checkout() {
               {order.notice}
             </p>
           )}
-          {order.phase === 'not_configured' && (
-            <code className={cls.payCode}>POST /payments/create → {order.payStatus}</code>
-          )}
           {order.phase === 'ready' && (
             <button
               type="button"

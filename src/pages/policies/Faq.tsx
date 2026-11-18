@@ -171,9 +171,8 @@ export function Faq() {
           <P>
             We initiate approved refunds within{' '}
             <Detail value={RETURNS.refundInitiationDays} what="refund initiation time" />,
-            back to the way you paid. Your bank or UPI app then takes{' '}
-            <Detail value={RETURNS.refundCompletionDays} what="bank credit time" /> to show
-            it.
+            back to the way you paid. Reaching your account then takes{' '}
+            <Detail value={RETURNS.refundCompletionDays} what="bank credit time" />.
           </P>
         </Faq1>
       </Section>

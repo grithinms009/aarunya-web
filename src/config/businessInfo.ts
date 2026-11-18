@@ -259,7 +259,7 @@ export const PAYMENTS = {
 };
 
 /** Shown as "Last updated" on every policy page. Bump when policy wording changes. */
-export const POLICIES_UPDATED: Supplied<string> = '17 October 2026';
+export const POLICIES_UPDATED: Supplied<string> = '18 November 2026';
 
 /* ------------------------------------------------------------------ readiness */
 

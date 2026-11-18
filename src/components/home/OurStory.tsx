@@ -54,7 +54,7 @@ export function OurStory() {
             for festivals. Every design is chosen by Veena, one by one, from our home in Kerala.
           </p>
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.85, color: '#5E534E', fontWeight: 300 }}>
-            From temple-inspired motifs and mango malas to delicate everyday chains, each piece
+            From floral jhumkas and pearl drops to delicate everyday chains, each piece
             carries a little of <strong style={{ fontWeight: 500, color: '#302722' }}>South India’s love for gold</strong>,
             made anti-tarnish so it keeps its shine.
           </p>

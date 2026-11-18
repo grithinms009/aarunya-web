@@ -9,7 +9,7 @@ import { PinIcon } from '@/components/ui/icons';
 /** PIN-code delivery estimate, plus the standing shipping lines. */
 export function DeliveryCheck() {
   const d = useDelivery();
-  const copy = d.result?.maxDays !== undefined ? deliveryCopy(d.result.maxDays) : null;
+  const copy = d.result?.ok ? deliveryCopy(d.result.zone) : null;
 
   const thr = CONFIG.FREE_SHIPPING_THRESHOLD;
   const fee = CONFIG.SHIPPING_FEE;
@@ -99,7 +99,7 @@ export function DeliveryCheck() {
           )}
           {copy && (
             <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: '#4A3F3A' }}>
-              Arrives by <strong style={{ fontWeight: 600, color: '#8D3545' }}>{copy.date}</strong>. {copy.cut}
+              {copy}
             </p>
           )}
         </div>

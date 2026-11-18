@@ -7,7 +7,6 @@ import { SaleOffers } from '@/components/home/SaleOffers';
 import { WhyAarunya } from '@/components/home/WhyAarunya';
 import { OurStory } from '@/components/home/OurStory';
 import { InstagramGrid } from '@/components/home/InstagramGrid';
-import { Newsletter } from '@/components/home/Newsletter';
 import { ProductRow, fitRows } from '@/components/home/ProductRow';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useCatalog } from '@/hooks/useCatalog';
@@ -73,7 +72,6 @@ export function Home() {
       <WhyAarunya />
       <OurStory />
       <InstagramGrid />
-      <Newsletter />
     </>
   );
 }
